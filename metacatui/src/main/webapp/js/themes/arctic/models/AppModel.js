@@ -35,7 +35,7 @@ define(['jquery', 'underscore', 'backbone'],
 			maxDownloadSize: 3000000000,
 
 			metacatVersion: "2.8.0",
-			baseUrl: window.location.origin || (window.location.protocol + "//" + window.location.host),
+			baseUrl: "https://arcticdata.io",//window.location.origin || (window.location.protocol + "//" + window.location.host),
 			// the most likely item to change is the Metacat deployment context
 			context: '/metacat',
 			d1Service: '/d1/mn/v2',
@@ -111,7 +111,7 @@ define(['jquery', 'underscore', 'backbone'],
 			if(this.get("d1CNBaseUrl")){
 
 				this.set("resolveServiceUrl", this.get("d1CNBaseUrl") + this.get("d1CNService") + "/resolve/");
-				
+
 				//Account services
 				if(typeof this.get("accountsUrl") != "undefined"){
 					this.set("accountsUrl", this.get("d1CNBaseUrl") + this.get("d1CNService") + "/accounts/");
