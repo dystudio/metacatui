@@ -147,7 +147,28 @@ define(['jquery', 'underscore', 'backbone', 'bootstrap', 'jqueryform', 'views/Si
 					data: this.registryQueryString + stageParams,
 					success: function(data, textStatus, jqXHR) {
 
-						viewRef.$el.html(data);
+            //If there is an error message that says the user should use Morpho,
+            //  then redirect them to the Beta editor.
+            if( data.indexOf("use Morpho") > -1 ){
+              if( window.location.href.indexOf("arcticdata") > -1 &&
+                window.location.href.indexOf("beta.arcticdata.io") == -1 ){
+
+                  var redirectURL = window.location.href.replace("arcticdata.io", "beta.arcticdata.io");
+
+                  if( redirectURL.indexOf("#share/modify") > -1 )
+                    redirectURL = redirectURL.replace("#share/modify", "#submit");
+
+                  viewRef.$el.html("<p>You are being redirected to the dataset editor...</p>" +
+                    "<p>If you are not redirected automatically, then click <a href='" +
+                    redirectURL + "'>" + redirectURL + "</a></p>");
+
+                  window.location.href = redirectURL;
+
+                  return;
+              }
+            }
+
+            viewRef.$el.html(data);
 
 						//If this is the login page, prepend some header HTML
 						if(data.indexOf('id="RegistryLogin"') != -1) viewRef.$el.prepend(viewRef.loginHeaderTemplate);
