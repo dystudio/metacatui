@@ -162,11 +162,10 @@ define(['jquery', 'underscore', 'backbone', 'bootstrap', 'jqueryform', 'views/Si
                   if( redirectURL.indexOf("/modify") > -1 )
                     redirectURL = redirectURL.replace("/modify", "");
 
-                  viewRef.$el.html("<p>You are being redirected to the dataset editor...</p>" +
-                    "<p>If you are not redirected automatically, then click <a href='" +
-                    redirectURL + "'>" + redirectURL + "</a></p>");
+                  viewRef.$el.html("<p>This data package can only be edited in our new editor in Beta at <a href='" +
+                    redirectURL + "'>" + redirectURL + "</a>. If you are experiencing issues, please email <a href='mailto:support@arcticdata.io'>support@arcticdata.io</a></p>");
 
-                  window.location.href = redirectURL;
+                  //window.location.href = redirectURL;
 
                   return;
               }
