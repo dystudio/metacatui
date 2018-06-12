@@ -155,8 +155,12 @@ define(['jquery', 'underscore', 'backbone', 'bootstrap', 'jqueryform', 'views/Si
 
                   var redirectURL = window.location.href.replace("arcticdata.io", "beta.arcticdata.io");
 
-                  if( redirectURL.indexOf("#share/modify") > -1 )
-                    redirectURL = redirectURL.replace("#share/modify", "#submit");
+                  if(redirectURL.indexOf("#registry") > -1){
+                    redirectURL = redirectURL.replace("#registry", "#submit");
+                  }
+
+                  if( redirectURL.indexOf("/modify") > -1 )
+                    redirectURL = redirectURL.replace("/modify", "");
 
                   viewRef.$el.html("<p>You are being redirected to the dataset editor...</p>" +
                     "<p>If you are not redirected automatically, then click <a href='" +
