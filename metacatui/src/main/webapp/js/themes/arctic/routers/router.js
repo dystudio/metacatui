@@ -18,7 +18,9 @@ function ($, _, Backbone) {
 			'signout'					: 'logout',
 			'signin'					: 'renderTokenSignIn',
 			"signinsuccess"           : "renderSignInSuccess",
-			'share(/:stage/*pid)'       : 'renderRegistry', // registry page
+			'share(/:stage/*pid)'       : 'renderBeta', // registry page
+			'submit(/:stage/*pid)'       : 'renderBeta', // registry page
+			'registry(/:stage/*pid)'       : 'renderRegistry', // registry page
 			'quality(/s=:suiteId)(/:pid)' : 'renderMdqRun', // MDQ page
 			'api(/:anchorId)'           : 'renderAPI'       // API page
 		},
@@ -166,7 +168,7 @@ function ($, _, Backbone) {
 
 			//Get the full identifier from the window object since Backbone filters out URL parameters starting with & and ?
 			pid = window.location.hash.substring(window.location.hash.indexOf("/")+1);
-			
+
 			var seriesId;
 
 			//Check for a seriesId
@@ -237,7 +239,7 @@ function ($, _, Backbone) {
 					appView.showView(appView.userView, viewOptions);
 			}
 		},
-		
+
 		renderMyProfile: function(section, subsection){
 			if(appUserModel.get("checked") && !appUserModel.get("loggedIn"))
 				this.renderTokenSignIn();
@@ -251,6 +253,25 @@ function ($, _, Backbone) {
 			}
 			else if(appUserModel.get("checked") && appUserModel.get("loggedIn")){
 				this.renderProfile(appUserModel.get("username"), section, subsection);
+			}
+		},
+
+		renderBeta: function(){
+			if( window.location.href.indexOf("arcticdata") > -1 &&
+				window.location.href.indexOf("beta.arcticdata.io") == -1 ){
+
+					var redirectURL = window.location.href.replace("arcticdata.io", "beta.arcticdata.io");
+
+					if( redirectURL.indexOf("#share/modify") > -1 )
+						redirectURL = redirectURL.replace("#share/modify", "#submit");
+
+					$("#Content").html("<p>You are being redirected to our new data package submission form in Beta ...</p>" +
+						"<p>If you are not redirected automatically, then click <a href='" +
+						redirectURL + "'>" + redirectURL + "</a></p>");
+
+					window.location.href = redirectURL;
+
+					return;
 			}
 		},
 

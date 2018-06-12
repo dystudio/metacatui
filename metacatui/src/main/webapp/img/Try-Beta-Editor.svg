@@ -4380,15 +4380,15 @@ MAETMIExQeD/AypNQ0mvtobKAAAAAElFTkSuQmCC" transform="matrix(0.2615 -0.0287 0.028
 </image>
 <rect x="-51.372" y="138.23" transform="matrix(-0.9942 0.1077 -0.1077 -0.9942 626.5295 737.4956)" fill="none" width="689.43" height="494.883"/>
 <rect fill="#192146" width="600" height="177"/>
-<text transform="matrix(1 0 0 1 21 35)" fill="#FFFFFF" font-family="'HelveticaNeue-Medium'" font-size="20">There’s a new way to submit data</text>
+<text transform="matrix(1 0 0 1 21 35)" fill="#FFFFFF" font-family="'HelveticaNeue-Medium', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'" font-size="20">There’s a new way to submit data</text>
 <rect x="24.104" y="55.098" fill="none" width="552.817" height="44.998"/>
-<text transform="matrix(1 0 0 1 24.1045 65.8076)"><tspan x="0" y="0" fill="#FFFFFF" font-family="'HelveticaNeue'" font-size="15">Try the new beta dataset editor for a richer submission experience. You can </tspan><tspan x="0" y="18" fill="#FFFFFF" font-family="'HelveticaNeue'" font-size="15">switch back to this older editor at any time. </tspan></text>
+<text transform="matrix(1 0 0 1 24.1045 65.8076)"><tspan x="0" y="0" fill="#FFFFFF" font-family="'HelveticaNeue', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'" font-size="15">Try the new beta dataset editor for a richer submission experience. You can </tspan><tspan x="0" y="18" fill="#FFFFFF" font-family="'HelveticaNeue', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'" font-size="15">switch back to this older editor at any time. </tspan></text>
 <g>
 	<path fill="#15AC5D" d="M21,151.542c0,2.209,1.791,4,4,4h110.494c2.209,0,4-1.791,4-4v-33.998c0-2.209-1.791-4-4-4H25
 		c-2.209,0-4,1.791-4,4V151.542z"/>
 </g>
-<text transform="matrix(1 0 0 1 40 139)" fill="#FFFFFF" font-family="'HelveticaNeue-Medium'" font-size="15">Try the beta</text>
-<text transform="matrix(1 0 0 1 171 139)" fill="#BABABA" font-family="'HelveticaNeue'" font-size="15" text-decoration=" underline">Not now</text>
+<text transform="matrix(1 0 0 1 40 139)" fill="#FFFFFF" font-family="'HelveticaNeue-Medium', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'" font-size="15">Try the beta</text>
+<text transform="matrix(1 0 0 1 171 139)" fill="#BABABA" font-family="'HelveticaNeue-Medium', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'" font-size="15" text-decoration=" underline">Not now</text>
 <polygon fill="#192146" points="60.747,177 80.247,193.018 99.747,177 "/>
 <g>
 	<text transform="matrix(1 0 0 1 576.9219 19.9189)" fill="#BABABA" font-family="'FontAwesome'" font-size="17"></text>
