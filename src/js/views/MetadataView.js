@@ -298,6 +298,9 @@ define(['jquery',
                 viewRef.insertCopiables();
 
 								viewRef.setUpAnnotator();
+
+								// Scroll to the entity referenced by PID
+								viewRef.scrollToEntityInFragment();
 							}
 						},
 						error: function(xhr, textStatus, errorThrown){
@@ -2446,8 +2449,39 @@ define(['jquery',
 			var postamble = "]]}}";
 
 			return preamble + inner + postamble;
-		}
+		},
 
+		/**
+		 * Scroll to the first entity description page in the DOM that describes
+		 * the PID passed at the end of the URL in the fragment. This is useful
+		 * for sending the user a link to a particular section of the page for an
+		 * entity of interest.
+		 * 
+		 * e.g. To send a user to the section of the page describing entity D that
+		 * is described by metadata M, send them to '/view/M#D'.
+		 * 
+		 * Note that this method depends on the underlying Metacat view service
+		 * stylesheets to use the 'entitydetails' class and 'id' data attribute.
+		 * 
+		 * Also note that, if multiple possible elements are found, the first is
+		 * chosen as the scroll target.
+		*/
+		scrollToEntityInFragment: function() {
+			var hash =  document.location.hash,
+				hashValue,
+				targets;
+
+			if (typeof hash !== "string" && hash.length < 2) {
+				return;
+			}
+
+			hashValue = hash.slice(1, hash.length);
+			targets = $(".entitydetails[data-id='" + hashValue + "']");
+
+			if (targets.length > 0) {
+				MetacatUI.appView.scrollTo(targets[0]);
+			}
+		}
 	});
 
 	return MetadataView;
