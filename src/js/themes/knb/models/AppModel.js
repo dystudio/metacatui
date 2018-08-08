@@ -34,7 +34,7 @@ define(['jquery', 'underscore', 'backbone'],
 
 			// set this variable to true, if the content being published is moderated by the data team.
 			contentIsModerated: false,
-			
+
 			/*
 			 * emlEditorRequiredFields is a hash map of all the required fields in the EML Editor.
 			 * Any field set to true will prevent the user from saving the Editor until a value has been given
@@ -54,8 +54,20 @@ define(['jquery', 'underscore', 'backbone'],
 				temporalCoverage: true,
 				title: true
 			},
-			
+
 			editableFormats: ["eml://ecoinformatics.org/eml-2.1.1"],
+
+			defaultAccessPolicy: [{
+
+				subject: "CN=knb-data-admins,DC=dataone,DC=org",
+				read: true,
+				write: true,
+				changePermission: true
+			},
+			{
+				subject: "public",
+				read: true
+			}],
 
 			baseUrl: window.location.origin || (window.location.protocol + "//" + window.location.host),
 			// the most likely item to change is the Metacat deployment context
@@ -76,8 +88,8 @@ define(['jquery', 'underscore', 'backbone'],
 			metacatServiceUrl: null,
 			objectServiceUrl: null,
 			formatsServiceUrl: null,
-            formatsUrl: "/formats",
-            //grantsUrl: null,
+      formatsUrl: "/formats",
+      //grantsUrl: null,
 			//bioportalSearchUrl: null,
 			//orcidSearchUrl: null,
 			//orcidBioUrl: null,
@@ -92,7 +104,28 @@ define(['jquery', 'underscore', 'backbone'],
 			accountsMapsUrl: null,
 			groupsUrl: null,
 			portalUrl: null,
-			mdqUrl: "https://quality.nceas.ucsb.edu/quality/"
+			mdqUrl: "https://quality.nceas.ucsb.edu/quality/",
+
+			// Metrics endpoint url
+			metricsUrl: null,
+			
+			// Metrics flags for the Dataset Landing Page
+			// Enable these flags to enable metrics display
+			displayDatasetMetrics: true,
+
+			// Controlling individual functionality
+			// Only works if the parent flags displayDatasetMetrics is enabled
+			displayDatasetMetricsTooltip: true,
+			displayDatasetCitationMetric: true,
+			displayDatasetDownloadMetric: true,
+			displayDatasetViewMetric: true,
+			displayDatasetEditButton: true,
+			displayDatasetQualityMetric: false,
+			displayDatasetAnalyzeButton: false,
+			displayMetricModals: false,
+			displayDatasetControls: true,
+
+			isJSONLDEnabled: true
 		},
 
 		defaultView: "data",
@@ -115,21 +148,21 @@ define(['jquery', 'underscore', 'backbone'],
 			this.set('objectServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/object/');
 			//this.set('ldapwebServiceUrl', this.get('baseUrl') + this.get('context') + '/cgi-bin/ldapweb.cgi');
 			this.set('metacatServiceUrl', this.get('baseUrl') + this.get('context') + '/metacat');
-			//The package service 
+			//The package service
 			this.set('packageServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/packages/application%2Fbagit-097/');
 
 			if(typeof this.get("grantsUrl") !== "undefined")
-				this.set("grantsUrl", this.get("baseUrl") + "/api.nsf.gov/services/v1/awards.json");
-			
+				this.set("grantsUrl", "https://api.nsf.gov/services/v1/awards.json");
+
 			//ORCID search
 			if(typeof this.get("orcidBaseUrl") != "undefined")
 				this.set('orcidSearchUrl', this.get('orcidBaseUrl') + '/search/orcid-bio?q=');
-			
+
 			// Object format list
-            if ( typeof this.get("formatsUrl") != "undefined" ) {
-                this.set("formatsServiceUrl", 
-                    this.get("d1CNBaseUrl") + this.get("d1CNService") + this.get("formatsUrl"));
-            }
+      if ( typeof this.get("formatsUrl") != "undefined" ) {
+          this.set("formatsServiceUrl",
+              this.get("d1CNBaseUrl") + this.get("d1CNService") + this.get("formatsUrl"));
+      }
 
 			//DataONE CN API
 			if(this.get("d1CNBaseUrl")){
@@ -154,7 +187,7 @@ define(['jquery', 'underscore', 'backbone'],
 				//Token URLs
 				this.set("portalUrl", this.get("d1CNBaseUrl") + "portal/");
 				this.set("tokenUrl",  this.get("portalUrl") + "token");
-										
+
 				//The sign-in and out URLs - allow these to be turned off by removing them in the defaults above (hence the check for undefined)
 				if(typeof this.get("signInUrl") !== "undefined")
 					this.set("signInUrl", this.get('portalUrl') + "startRequest?target=");
@@ -164,15 +197,18 @@ define(['jquery', 'underscore', 'backbone'],
 					this.set("signInUrlLdap", this.get('portalUrl') + "ldap?target=");
 				if(this.get('orcidBaseUrl'))
 					this.set('orcidSearchUrl', this.get('orcidBaseUrl') + '/v1.1/search/orcid-bio?q=');
-				
+
 				if((typeof this.get("signInUrl") !== "undefined") || (typeof this.get("signInUrlOrcid") !== "undefined"))
 					this.set("signOutUrl", this.get('portalUrl') + "logout");
-				
+
 				if(typeof this.get("d1LogServiceUrl") != "undefined")
 					this.set('d1LogServiceUrl', this.get('d1CNBaseUrl') + this.get('d1CNService') + '/query/logsolr/?');
 
+
+
+				this.set("metricsUrl", 'https://logproc-stage-ucsb-1.test.dataone.org/metrics/filters');
 			}
-							
+
 			this.on("change:pid", this.changePid);
 		},
 

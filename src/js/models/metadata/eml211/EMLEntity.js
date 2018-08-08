@@ -1,6 +1,6 @@
-define(["jquery", "underscore", "backbone", "models/DataONEObject",
+define(["jquery", "underscore", "backbone", "uuid", "models/DataONEObject",
         "models/metadata/eml211/EMLAttribute"],
-    function($, _, Backbone, DataONEObject, EMLAttribute) {
+    function($, _, Backbone, uuid, DataONEObject, EMLAttribute) {
 
         /*
          * EMLEntity represents an abstract data entity, corresponding
@@ -51,6 +51,7 @@ define(["jquery", "underscore", "backbone", "models/DataONEObject",
 	                    "constraint"
 	                ],
 	                parentModel: null, // The parent model this entity belongs to
+	                dataONEObject: null, //Reference to the DataONEObject this EMLEntity describes
 	                objectXML: null, // The serialized XML of this EML entity
 	                objectDOM: null  // The DOM of this EML entity
             	}
@@ -153,6 +154,11 @@ define(["jquery", "underscore", "backbone", "models/DataONEObject",
                 		downloadID = downloadURL.substring( downloadURL.indexOf("/resolve/") + 9 );
                 	else if( downloadURL.indexOf("/object/") > -1 )
                 		downloadID = downloadURL.substring( downloadURL.indexOf("/object/") + 8 );
+                	else if( downloadURL.indexOf("ecogrid") > -1 ){
+                		var withoutEcoGridPrefix = downloadURL.substring( downloadURL.indexOf("ecogrid://") + 10 ),
+							downloadID = withoutEcoGridPrefix.substring( withoutEcoGridPrefix.indexOf("/")+1 );
+                	}
+
 
                 	if(downloadID.length)
                         attributes.downloadID = downloadID;
@@ -200,24 +206,68 @@ define(["jquery", "underscore", "backbone", "models/DataONEObject",
             },
 
             /*
-             * Remove an attribute from the attributeList
+             * Remove an EMLAttribute model from the attributeList array
+             *
+             * @param {EMLAttribute} - The EMLAttribute model to remove from this model's attributeList
              */
-            removeAttribute: function(attribute, index) {
-            	if(!index)
-            		var attrIndex = this.get("attributeList").indexOf(attribute);
+            removeAttribute: function(attribute) {
 
+              //Get the index of the EMLAttribute in the array
+            	var attrIndex = this.get("attributeList").indexOf(attribute);
+
+              //If this attribute model does not exist in the attribute list, don't do anything
+              if( attrIndex == -1 ){
+                return;
+              }
+
+              //Remove that index from the array
             	this.get("attributeList").splice(attrIndex, 1);
+
+              //Trickle the change up the model chain
+              this.trickleUpChange();
             },
 
             /* Validate the top level EMLEntity fields */
             validate: function() {
-                var errorMap = {};
+                var errors = {};
+
                 // will be run by calls to isValid()
                 if ( ! this.get("entityName") ) {
-                    errorMap.entityName = new Error("An entity name is required.");
+                    errors.entityName = "An entity name is required.";
                 }
 
-                return errorMap;
+                //Validate the attributes
+                var attributeErrors = this.validateAttributes();
+                if(attributeErrors.length)
+                  errors.attributeList = errors;
+
+                if( Object.keys(errors).length )
+                  return errors;
+                else{
+                  this.trigger("valid");
+                  return false;
+                }
+
+            },
+
+            /*
+            * Validates each of the EMLAttribute models in the attributeList
+            *
+            * @return {Array} - Returns an array of error messages for all the EMlAttribute models
+            */
+            validateAttributes: function(){
+              var errors = [];
+
+              //Validate each of the EMLAttributes
+              _.each( this.get("attributeList"), function(attribute){
+
+                if( !attribute.isValid() ){
+                  errors.push(attribute.validationError);
+                }
+
+              });
+
+              return errors;
             },
 
             /* Copy the original XML and update fields in a DOM object */
@@ -245,7 +295,20 @@ define(["jquery", "underscore", "backbone", "models/DataONEObject",
                 // update the id attribute
                 var xmlID = this.get("xmlID");
                 if ( xmlID ) {
-                    $(objectDOM).attr("id", xmlID);
+
+                   //Check if the physical section is using this object's id as the id attribute
+                   if( this.get("dataONEObject") && $(objectDOM).find("physical").attr("id") == this.get("dataONEObject").get("id") ){
+                     //Ideally, the EMLEntity will use the object's id in it's id attribute, so we wil switch them
+                     xmlID = this.get("dataONEObject").getXMLSafeID();
+
+                     //Set the xml-safe id on the model and use it as the id attribute
+                     $(objectDOM).attr("id", xmlID);
+                     this.set("xmlID", xmlID);
+
+                     //Use a random uuid as the id for the physical section
+                     $(objectDOM).find("physical").attr("id", "urn-uuid-" + uuid.v4());
+                   }
+
                 }
 
                 // Update the alternateIdentifiers
@@ -263,6 +326,12 @@ define(["jquery", "underscore", "backbone", "models/DataONEObject",
                                     .text(altID));
                         });
                     }
+                }
+                else{
+
+                  // Remove all current alternateIdentifiers
+                  $(objectDOM).find("alternateIdentifier").remove();
+
                 }
 
                 // Update the entityName
@@ -297,6 +366,13 @@ define(["jquery", "underscore", "backbone", "models/DataONEObject",
                                 .text(this.get("entityDescription"))[0]);
                         }
                     }
+                }
+                //If there is no entity description
+                else{
+
+                  //If there is an entity description node in the XML, remove it
+                  $(objectDOM).find("entityDescription").remove();
+
                 }
 
                 // TODO: Update the physical section
@@ -378,6 +454,27 @@ define(["jquery", "underscore", "backbone", "models/DataONEObject",
                         return $(objectDOM).find(nodeOrder[i].toLowerCase()).last()[0];
                     }
                 }
+            },
+
+            /*
+            * Climbs up the model heirarchy until it finds the EML model
+            *
+            * @return {EML211 or false} - Returns the EML 211 Model or false if not found
+            */
+            getParentEML: function(){
+              var emlModel = this.get("parentModel"),
+                  tries = 0;
+
+              while (emlModel.type !== "EML" && tries < 6){
+                emlModel = emlModel.get("parentModel");
+                tries++;
+              }
+
+              if( emlModel && emlModel.type == "EML")
+                return emlModel;
+              else
+                return false;
+
             },
 
             /*Format the EML XML for entities*/

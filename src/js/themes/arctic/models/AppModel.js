@@ -29,12 +29,12 @@ define(['jquery', 'underscore', 'backbone'],
 
 			userProfiles: true,
 			profileUsername: null,
-						
+
 			maxDownloadSize: 3000000000,
 
 			// set this variable to true, if the content being published is moderated by the data team.
 			contentIsModerated: true,
-			
+
 			/*
 			 * emlEditorRequiredFields is a hash map of all the required fields in the EML Editor.
 			 * Any field set to true will prevent the user from saving the Editor until a value has been given
@@ -54,8 +54,16 @@ define(['jquery', 'underscore', 'backbone'],
 				temporalCoverage: true,
 				title: true
 			},
-			
+
 			editableFormats: ["eml://ecoinformatics.org/eml-2.1.1"],
+
+			defaultAccessPolicy: [{
+
+				subject: "CN=arctic-data-admins,DC=dataone,DC=org",
+				read: true,
+				write: true,
+				changePermission: true
+			}],
 
 			baseUrl: window.location.origin || (window.location.protocol + "//" + window.location.host),
 			// the most likely item to change is the Metacat deployment context
@@ -75,7 +83,7 @@ define(['jquery', 'underscore', 'backbone'],
 			metacatServiceUrl: null,
 			objectServiceUrl: null,
 			formatsServiceUrl: null,
-            formatsUrl: "/formats",
+			formatsUrl: "/formats",
 			resolveServiceUrl: null,
 			//bioportalSearchUrl: null,
 			orcidBaseUrl: "https:/orcid.org",
@@ -92,9 +100,28 @@ define(['jquery', 'underscore', 'backbone'],
 			signInUrlOrcid: null,
 			//signInUrlLdap: null,
 			tokenUrl: null,
-			setPublicAccess: true, // Set to true to force public read access on newly created objects
-			mdqUrl: "https://quality.nceas.ucsb.edu/quality/"
+			mdqUrl: "https://quality.nceas.ucsb.edu/quality/",
 
+			// Metrics endpoint url
+			metricsUrl: null,
+
+			// Metrics flags for the Dataset Landing Page
+			// Enable these flags to enable metrics display
+			displayDatasetMetrics: true,
+
+			// Controlling individual functionality
+			// Only works if the parent flags displayDatasetMetrics is enabled
+			displayDatasetMetricsTooltip: true,
+			displayDatasetCitationMetric: true,
+			displayDatasetDownloadMetric: true,
+			displayDatasetViewMetric: true,
+			displayDatasetEditButton: true,
+			displayDatasetQualityMetric: false,
+			displayDatasetAnalyzeButton: false,
+			displayMetricModals: false,
+			displayDatasetControls: true,
+
+			isJSONLDEnabled: true
 		},
 
 		defaultView: "data",
@@ -121,11 +148,11 @@ define(['jquery', 'underscore', 'backbone'],
 
 			//Set the NSF Award API proxy
 			if(typeof this.get("grantsUrl") != "undefined")
-				this.set("grantsUrl", this.get("baseUrl") + "/api.nsf.gov/services/v1/awards.json");
+				this.set("grantsUrl", "https://api.nsf.gov/services/v1/awards.json");
 
 			//DataONE CN API
 			if(this.get("d1CNBaseUrl")){
-				
+
 				//Account services
 				if(typeof this.get("accountsUrl") != "undefined"){
 					this.set("accountsUrl", this.get("d1CNBaseUrl") + this.get("d1CNService") + "/accounts/");
@@ -142,15 +169,15 @@ define(['jquery', 'underscore', 'backbone'],
 
 				if(typeof this.get("d1LogServiceUrl") != "undefined")
 					this.set('d1LogServiceUrl', this.get('d1CNBaseUrl') + this.get('d1CNService') + '/query/logsolr/?');
-				
+
 				this.set("nodeServiceUrl", this.get("d1CNBaseUrl") + this.get("d1CNService") + "/node/");
 				this.set('resolveServiceUrl', this.get('d1CNBaseUrl') + this.get('d1CNService') + '/resolve/');
-				
+
 				// Object format list
-                if ( typeof this.get("formatsUrl") != "undefined" ) {
-                    this.set("formatsServiceUrl", 
-                        this.get("d1CNBaseUrl") + this.get("d1CNService") + this.get("formatsUrl"));
-                }
+        if ( typeof this.get("formatsUrl") != "undefined" ) {
+            this.set("formatsServiceUrl",
+                this.get("d1CNBaseUrl") + this.get("d1CNService") + this.get("formatsUrl"));
+        }
 
 				//Authentication / portal URLs
 				this.set('portalUrl', this.get('d1CNBaseUrl') + 'portal/');
@@ -173,12 +200,17 @@ define(['jquery', 'underscore', 'backbone'],
 				if((typeof this.get("signInUrl") !== "undefined") || (typeof this.get("signInUrlOrcid") !== "undefined"))
 					this.set("signOutUrl", this.get('portalUrl') + "logout");
 
+
+
+				this.set("metricsUrl", 'https://logproc-stage-ucsb-1.test.dataone.org/metrics/filters');
 			}
-			
+
 			//The package service for v2 DataONE API
 			this.set('packageServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/packages/application%2Fbagit-097/');
 
 			this.on("change:pid", this.changePid);
+
+
 		},
 
 		changePid: function(model, name){

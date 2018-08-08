@@ -1,7 +1,8 @@
 {
   "cacheBuster" : "08082018",
   "theme": "default",
-  "root": "http://localhost:8080/metacatui",
+  "root": "http://metacatui.localhost/metacatui",
   "metacatUIVersion": "2.1.0",
-  "context" : "/metacat"
+  "context" : "/knb",
+  "baseUrl" : "https://dev.nceas.ucsb.edu"
 }

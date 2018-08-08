@@ -34,7 +34,7 @@ define(['jquery', 'underscore', 'backbone'],
 
 			// set this variable to true, if the content being published is moderated by the data team.
 			contentIsModerated: false,
-			
+
 			baseUrl: window.location.origin || (window.location.protocol + "//" + window.location.host),
 			// the most likely item to change is the Metacat deployment context
 			context: '',
@@ -70,8 +70,29 @@ define(['jquery', 'underscore', 'backbone'],
 			signInUrlOrcid: null,
 			//signInUrlLdap: null,
 			tokenUrl: null,
-			mdqUrl: null
+			mdqUrl: null,
 
+
+			// Metrics endpoint url
+			metricsUrl: null,
+			
+			// Metrics flags for the Dataset Landing Page
+			// Enable these flags to enable metrics display
+			displayDatasetMetrics: true,
+
+			// Controlling individual functionality
+			// Only works if the parent flags displayDatasetMetrics is enabled
+			displayDatasetMetricsTooltip: true,
+			displayDatasetCitationMetric: true,
+			displayDatasetDownloadMetric: true,
+			displayDatasetViewMetric: true,
+			displayDatasetEditButton: false,
+			displayDatasetQualityMetric: false,
+			displayDatasetAnalyzeButton: false,
+			displayMetricModals: false,
+			displayDatasetControls: true,
+
+			isJSONLDEnabled: true
 		},
 
 		defaultView: "data",
@@ -140,6 +161,9 @@ define(['jquery', 'underscore', 'backbone'],
 				this.set("bioportalSearchUrl", "https://data.bioontology.org/search?ontologies=ECSO&apikey=" + this.get("bioportalAPIKey") + "&pagesize=1000&suggest=true&q=")
 
 			this.on("change:pid", this.changePid);
+
+
+			this.set("metricsUrl", 'https://logproc-stage-ucsb-1.test.dataone.org/metrics/filters');
 		},
 
 		changePid: function(model, name){

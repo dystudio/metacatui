@@ -61,7 +61,8 @@ define(['jquery',
 			var view = this;
 						
 			//Get all the fields from the Solr index
-			var query = 'q=id:"' + encodeURIComponent(this.pid) + '"&rows=1&start=0&fl=*&wt=json';
+			var query = 'q=(id:"' + encodeURIComponent(this.pid) + '"+OR+seriesId:"'+
+									encodeURIComponent(this.pid)+'")&rows=1&start=0&fl=*&wt=json';
 			var requestSettings = {
 				url: MetacatUI.appModel.get('queryServiceUrl') + query, 
 				success: function(data, textStatus, xhr){ 
@@ -70,7 +71,7 @@ define(['jquery',
 						var msg = "<h4>Nothing was found for one of the following reasons:</h4>" +
 								  "<ul class='indent'>" +
 								  	  "<li>The ID '" + view.pid  + "' does not exist.</li>" +
-									  '<li>This may be private content. (Are you <a href="#signin">signed in?</a>)</li>' +
+									  '<li>This may be private content. (Are you <a href="<%= MetacatUI.root %>/signin">signed in?</a>)</li>' +
 									  "<li>The content was removed because it was invalid.</li>" +
 								  "</ul>";
 						view.$el.html(view.alertTemplate({msg: msg, classes: "alert-danger"}));

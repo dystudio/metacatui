@@ -57,6 +57,8 @@ define(['jquery', 'underscore', 'backbone'],
 
 			editableFormats: ["eml://ecoinformatics.org/eml-2.1.1"],
 
+			defaultAccessPolicy: [],
+
 			baseUrl: window.location.origin || (window.location.protocol + "//" + window.location.host),
 			// the most likely item to change is the Metacat deployment context
 			context: '/metacat',
@@ -74,8 +76,8 @@ define(['jquery', 'underscore', 'backbone'],
 			metacatBaseUrl: null,
 			metacatServiceUrl: null,
 			objectServiceUrl: null,
-            formatsServiceUrl: null,
-            formatsUrl: "/formats",
+      formatsServiceUrl: null,
+      formatsUrl: "/formats",
 			//grantsUrl: null,
 			//bioportalSearchUrl: null,
 			//orcidSearchUrl: null,
@@ -92,7 +94,28 @@ define(['jquery', 'underscore', 'backbone'],
 			accountsMapsUrl: null,
 			groupsUrl: null,
 			portalUrl: null,
-			mdqUrl: null
+			mdqUrl: null,
+
+			// Metrics endpoint url
+			metricsUrl: null,
+
+			// Metrics flags for the Dataset Landing Page
+			// Enable these flags to enable metrics display
+			displayDatasetMetrics: true,
+
+			// Controlling individual functionality
+			// Only works if the parent flags displayDatasetMetrics is enabled
+			displayDatasetMetricsTooltip: true,
+			displayDatasetCitationMetric: true,
+			displayDatasetDownloadMetric: true,
+			displayDatasetViewMetric: true,
+			displayDatasetEditButton: true,
+			displayDatasetQualityMetric: false,
+			displayDatasetAnalyzeButton: false,
+			displayMetricModals: false,
+			displayDatasetControls: true,
+
+			isJSONLDEnabled: true
 		},
 
 		defaultView: "data",
@@ -119,7 +142,7 @@ define(['jquery', 'underscore', 'backbone'],
 			this.set('metacatServiceUrl', this.get('baseUrl') + this.get('context') + '/metacat');
 
 			if(typeof this.get("grantsUrl") !== "undefined")
-				this.set("grantsUrl", this.get("baseUrl") + "/api.nsf.gov/services/v1/awards.json");
+				this.set("grantsUrl", "https://api.nsf.gov/services/v1/awards.json");
 
 			//DataONE CN API
 			if(this.get("d1CNBaseUrl")){
@@ -167,10 +190,10 @@ define(['jquery', 'underscore', 'backbone'],
 				}
 
 				// Object format list
-                if ( typeof this.get("formatsUrl") != "undefined" ) {
-                     this.set("formatsServiceUrl",
-                     this.get("d1CNBaseUrl") + this.get("d1CNService") + this.get("formatsUrl"));
-                }
+        if ( typeof this.get("formatsUrl") != "undefined" ) {
+             this.set("formatsServiceUrl",
+             this.get("d1CNBaseUrl") + this.get("d1CNService") + this.get("formatsUrl"));
+        }
 
 				//ORCID search
 				if(typeof this.get("orcidBaseUrl") != "undefined")
@@ -189,6 +212,9 @@ define(['jquery', 'underscore', 'backbone'],
 			this.set('packageServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/packages/application%2Fbagit-097/');
 
 			this.on("change:pid", this.changePid);
+
+			this.set("metricsUrl", 'https://logproc-stage-ucsb-1.test.dataone.org/metrics/filters');
+
 		},
 
 		changePid: function(model, name){
