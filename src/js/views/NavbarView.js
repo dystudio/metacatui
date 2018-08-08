@@ -70,7 +70,7 @@ define(['jquery', 'underscore', 'backbone', 'views/SignInView', 'text!templates/
 				var bgNum = Math.ceil(Math.random() * imgCnt);
 				
 				$(imageEl).css('background-image', "url('./js/themes/" + 
-                MetacatUI.theme.get("themeName") + "/img/backgrounds/bg" + bgNum + ".jpg')");
+                MetacatUI.appModel.get("theme") + "/img/backgrounds/bg" + bgNum + ".jpg')");
 			}
 		},
 		

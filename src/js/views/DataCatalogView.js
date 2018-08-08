@@ -155,7 +155,7 @@ define(['jquery',
 					isMySearch      : (_.indexOf(this.searchModel.get("username"), MetacatUI.appUserModel.get("username")) > -1),
 					loading         : loadingHTML,
 					searchModelRef  : this.searchModel, 
-					dataSourceTitle : (MetacatUI.theme.get("themeName") == "dataone") ? "Member Node" : "Data source"
+					dataSourceTitle : (MetacatUI.appModel.get("theme") == "dataone") ? "Member Node" : "Data source"
 				}
 			var cel = this.template(_.extend(this.searchModel.toJSON(), templateVars));
 			
@@ -2661,7 +2661,7 @@ define(['jquery',
 			var numFound = this.searchResults.length;
 			if (numFound == 0){
 				this.$results.html('<p id="no-results-found">No results found.</p>');
-				if (MetacatUI.theme.get("themeName") == "arctic") {
+				if (MetacatUI.appModel.get("theme") == "arctic") {
 					//When we get new results, check if the user is searching for their own datasets and display a message
 					if((MetacatUI.appView.dataCatalogView && MetacatUI.appView.dataCatalogView.searchModel.getQuery() == MetacatUI.appUserModel.get("searchModel").getQuery()) && !MetacatUI.appSearchResults.length){
 						$("#no-results-found").after("<h3>Where are my data sets?</h3><p>If you are a previous ACADIS Gateway user, " +

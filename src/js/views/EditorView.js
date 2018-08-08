@@ -493,7 +493,7 @@ define(['underscore',
             // Review message for "arctic" theme.
             if (MetacatUI.appModel.get("contentIsModerated")) {
                 var message = this.editorSubmitMessageTemplate({
-                    	themeTitle: MetacatUI.theme.get("themeTitle")
+                    	themeTitle: MetacatUI.appModel.get("title")
                 	}),
                 	timeout = null;
                 

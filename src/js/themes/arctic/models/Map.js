@@ -43,7 +43,7 @@ define(['jquery', 'underscore', 'backbone', 'gmaps'],
 				drawMarkers: false,
 				
 				//If this theme doesn't have an image in this location, Google maps will use their default marker image
-				markerImage: "./js/themes/" + MetacatUI.theme.get("themeName") + "/img/map-marker.png",
+				markerImage: "./js/themes/" + MetacatUI.appModel.get("theme") + "/img/map-marker.png",
 				
 				//Keep track of the geohash level used to draw tiles on this map
 				tileGeohashLevel: 1,

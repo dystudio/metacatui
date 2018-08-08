@@ -2,6 +2,10 @@
 <html lang="en" data-framework="backbonejs">
 
 <head>
+  <script type="text/javascript">
+    var configURL = "http://localhost:8080/metacatuiconfig/config.js";
+  </script>
+
     <style>
         #loading-app {
             width: 100%;
@@ -367,7 +371,34 @@
         </div>
         <span>Loading...</span>
     </div>
-    <script id="entrypoint" type="text/javascript" src="components/require.js" data-main="js/app" data-theme="default" data-metacat-context="metacat" data-map-key="YOUR-GOOGLE-MAPS-API-KEY"></script>
+
+    <script type="text/javascript">
+
+      var xhr = new XMLHttpRequest(),
+          MetacatUI = {};
+
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            MetacatUI.config = JSON.parse(this.responseText);
+            MetacatUI.root = MetacatUI.config.root;
+            MetacatUI.cacheBuster = MetacatUI.config.cacheBuster;
+            console.log(MetacatUI.config);
+
+          var script = document.createElement("script");
+          script.setAttribute("type", "text/javascript");
+          script.setAttribute("id", "entrypoint");
+          script.setAttribute("data-main", MetacatUI.root + "/js/app");
+          script.setAttribute("src", MetacatUI.root + "/components/require.js?v=" + MetacatUI.cacheBuster);
+          document.getElementsByTagName("body")[0].appendChild(script);
+        }
+      }
+
+      xhr.open("GET", configURL);
+      xhr.responseType = "text";
+      xhr.send();
+
+    </script>
+
 </body>
 
 </html>
