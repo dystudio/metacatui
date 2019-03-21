@@ -1,4 +1,4 @@
-﻿/*global Backbone */
+/*global Backbone */
 'use strict';
 
 define(['jquery',	'underscore', 'backbone'],
@@ -8,28 +8,29 @@ function ($, _, Backbone) {
 	// ----------------
 	var UIRouter = Backbone.Router.extend({
 		routes: {
-			''                          : 'renderIndex',    // the default route
-			'about(/:anchorId)'         : 'renderAbout',    // about page
-			'help(/:page)(/:anchorId)'  : 'renderHelp',
-			'tools(/:anchorId)'         : 'renderTools',    // tools page
-			'data/my-data(/page/:page)' : 'renderMyData',    // data search page
+			''                               : 'renderIndex',    // the default route
+			'about(/:anchorId)'              : 'renderAbout',    // about page
+			'help(/:page)(/:anchorId)'       : 'renderHelp',
+			'tools(/:anchorId)'              : 'renderTools',    // tools page
+			'data/my-data(/page/:page)'      : 'renderMyData',    // data search page
 			'data(/mode=:mode)(/query=:query)(/page/:page)' : 'renderData',    // data search page
-			'data/my-data'              : 'renderMyData',
+			'data/my-data'                   : 'renderMyData',
 			'profile(/*username)(/s=:section)(/s=:subsection)' : 'renderProfile',
 			'my-profile(/s=:section)(/s=:subsection)' : 'renderMyProfile',
 			//'my-account'                   : 'renderUserSettings',
-			'external(/*url)'           : 'renderExternal', // renders the content of the given url in our UI
-			'logout'                    : 'logout',    		// logout the user
-			'signout'                   : 'logout',    		// logout the user
-			'signin'                    : 'renderSignIn',    		// logout the user
-			"signinsuccess"             : "renderSignInSuccess",
-			"signinldaperror"           : "renderLdapSignInError",
-			"signinLdap"                : "renderLdapSignIn",
-			"signinSuccessLdap"         : "renderLdapSignInSuccess",
-			'share(/*pid)'              : 'renderEditor', // registry page
-			'submit(/*pid)'             : 'renderEditor', // registry page
-			'quality(/s=:suiteId)(/:pid)' : 'renderMdqRun', // MDQ page
-			'api(/:anchorId)'           : 'renderAPI'       // API page
+			'external(/*url)'                : 'renderExternal', // renders the content of the given url in our UI
+			'logout'                         : 'logout', // logout the user
+			'signout'                        : 'logout', // logout the user
+			'signin'                         : 'renderSignIn', // logout the user
+			"signinsuccess"                  : "renderSignInSuccess",
+			"signinldaperror"                : "renderLdapSignInError",
+			"signinLdap"                     : "renderLdapSignIn",
+			"signinSuccessLdap"              : "renderLdapSignInSuccess",
+			'share(/*pid)'                   : 'renderEditor', // registry page
+			'submit(/*pid)'                  : 'renderEditor', // registry page
+			'quality(/s=:suiteId)(/:pid)'    : 'renderMdqRun', // MDQ page
+			'api(/:anchorId)'                : 'renderAPI', // API page
+			'projects(/:projectId)(/:projectSection)': 'renderProject' // project page
 		},
 
 		helpPages: {
@@ -46,8 +47,8 @@ function ($, _, Backbone) {
 			// to make this route more inclusive.
 			this.route(/^view\/(.*)$/, "renderMetadata");
 
-			this.on("route", this.trackHash);
-			
+			this.on("route", this.trackPathName);
+
 			// Clear stale JSONLD and meta tags
 			this.on("route", this.clearJSONLD);
 			this.on("route", this.clearHighwirePressMetaTags);
@@ -55,7 +56,7 @@ function ($, _, Backbone) {
 
 		//Keep track of navigation movements
 		routeHistory: new Array(),
-		hashHistory: new Array(),
+		pathHistory: new Array(),
 
 		// Will return the last route, which is actually the second to last item in the route history,
 		// since the last item is the route being currently viewed
@@ -66,21 +67,22 @@ function ($, _, Backbone) {
 				return this.routeHistory[this.routeHistory.length-2];
 		},
 
-		trackHash: function(e){
-			if(_.last(this.hashHistory) != window.location.hash)
-				this.hashHistory.push(window.location.hash);
+		trackPathName: function(e){
+			if(_.last(this.pathHistory) != window.location.pathname)
+				this.pathHistory.push(window.location.pathname);
 		},
 
-		//If the user or app cancelled the last route, call this function to revert the window location hash back to the correct value
+		//If the user or app cancelled the last route, call this function to revert
+		// the window location pathname back to the correct value
 		undoLastRoute: function(){
 			this.routeHistory.pop();
 
-			// Remove the last route and hash from the history
-			if(_.last(this.hashHistory) == window.location.hash)
-				this.hashHistory.pop();
+			// Remove the last route and pathname from the history
+			if(_.last(this.pathHistory) == window.location.pathname)
+				this.pathHistory.pop();
 
-			//Change the hash in the window location back
-			this.navigate(_.last(this.hashHistory), {replace: true});
+			//Change the pathname in the window location back
+			this.navigate(_.last(this.pathHistory), {replace: true});
 		},
 
 		renderIndex: function (param) {
@@ -268,9 +270,7 @@ function ($, _, Backbone) {
 
 			//Check for a query URL parameter
 			if((typeof query !== "undefined") && query){
-				var customQuery = MetacatUI.appSearchModel.get('additionalCriteria');
-				customQuery.push(query);
-				MetacatUI.appSearchModel.set('additionalCriteria', customQuery);
+				MetacatUI.appSearchModel.set('additionalCriteria', [query]);
 			}
 
 			if(!MetacatUI.appView.dataCatalogView){
@@ -290,6 +290,89 @@ function ($, _, Backbone) {
 					MetacatUI.appView.dataCatalogView.mode = mode;
 
 				MetacatUI.appView.showView(MetacatUI.appView.dataCatalogView);
+			}
+		},
+
+        /*
+         * Render the project view based on the given name, id, or section
+         */
+		renderProject: function(projectId, projectSection) {
+            var projectName;
+            var projectsMap = MetacatUI.appModel.get("projectsMap");
+
+            // Look up the project document seriesId by its registered name if given
+            if ( projectId ) {
+                if ( projectsMap ) {
+                    // Do a forward lookup by key
+                    if ( typeof (projectsMap[projectId] ) !== "undefined" ) {
+                        projectName = projectId;
+                        projectId = projectsMap[projectId];
+                        // Then set the history
+                        if ( projectSection ) {
+                            this.routeHistory.push("projects/" + projectName + "/" + projectSection);
+                        } else {
+                            this.routeHistory.push("projects/" + projectName);
+                        }
+                    } else {
+                        // Try a reverse lookup of the project name by values
+                        projectName = _.findKey(projectsMap, function(value){
+                          return( value ==  projectId );
+                        });
+
+                        if ( typeof projectName !== "undefined" ) {
+                            if ( projectSection ) {
+                                this.routeHistory.push("projects/" + projectName + "/" + projectSection);
+                            } else {
+                                this.routeHistory.push("projects/" + projectName);
+                            }
+                        } else {
+
+                          //Try looking up the project name with case-insensitive matching
+                          projectName = _.findKey(projectsMap, function(value, key){
+                            return( key.toLowerCase() == projectId.toLowerCase() );
+                          });
+
+                          //If a matching project name was found, route to it
+                          if( projectName ){
+
+                            //Get the project ID from the map
+                            projectId = projectsMap[projectName];
+
+                            // Then set the history
+                            if ( projectSection ) {
+                              this.navigate("projects/" + projectName + "/" + projectSection, { trigger: false, replace: true });
+                              this.routeHistory.push("projects/" + projectName + "/" + projectSection);
+                            } else {
+                              this.navigate("projects/" + projectName, { trigger: false, replace: true });
+                              this.routeHistory.push("projects/" + projectName);
+                            }
+                          }
+                          else{
+                            // Fall back to routing to the project by id, not name
+                            this.routeHistory.push("projects/" + projectId);
+                          }
+                        }
+                    }
+                }
+            } else {
+                // TODO: Show a ProjectsView here of the Projects collection (no projectId given)
+                return;
+            }
+
+			if ( !MetacatUI.appView.projectView ) {
+				require(['views/project/ProjectView'], function(ProjectView){
+					MetacatUI.appView.projectView = new ProjectView({
+                        projectId: projectId,
+                        projectName: projectName,
+                        projectSection: projectSection
+                    });
+					MetacatUI.appView.showView(MetacatUI.appView.projectView);
+				});
+			} else {
+                MetacatUI.appView.projectView.projectName = projectName;
+                MetacatUI.appView.projectView.projectId = projectId;
+                MetacatUI.appView.projectView.projectSection = projectSection;
+				MetacatUI.appView.showView(MetacatUI.appView.projectView);
 			}
 		},
 
@@ -442,7 +525,7 @@ function ($, _, Backbone) {
 		renderLdapSignInSuccess: function(){
 
 			//If there is an LDAP sign in error message
-			if(window.location.hash.indexOf("error=Unable%20to%20authenticate%20LDAP%20user") > -1){
+			if(window.location.pathname.indexOf("error=Unable%20to%20authenticate%20LDAP%20user") > -1){
 				this.renderLdapOnlySignInError();
 			}
 			else{
@@ -458,11 +541,15 @@ function ($, _, Backbone) {
 				require(['views/SignInView'], function(SignInView){
 					MetacatUI.appView.signInView = new SignInView({ el: "#Content"});
 					MetacatUI.appView.signInView.ldapError = true;
+					MetacatUI.appView.signInView.ldapOnly = true;
+					MetacatUI.appView.signInView.fullPage = true;
 					MetacatUI.appView.showView(MetacatUI.appView.signInView);
 				});
 			}
 			else{
 				MetacatUI.appView.signInView.ldapError = true;
+				MetacatUI.appView.signInView.ldapOnly = true;
+				MetacatUI.appView.signInView.fullPage = true;
 				MetacatUI.appView.showView(MetacatUI.appView.signInView);
 			}
 		},
@@ -533,6 +620,51 @@ function ($, _, Backbone) {
 		navigateToDefault: function(){
 			//Navigate to the default view
 			this.navigate(MetacatUI.appModel.defaultView, {trigger: true});
+		},
+
+		/*
+		* Gets an array of route names that are set on this router.
+		* @return {Array} - An array of route names, not including any special characters
+		*/
+		getRouteNames: function(){
+
+			var router = this;
+
+		  var routeNames = _.map(Object.keys(this.routes), function(routeName){
+
+				return router.getRouteName(routeName);
+
+			});
+
+			//The "view" route is not included in the route hash (it is set up during initialize),
+			// so we have to manually add it here.
+			routeNames.push("view");
+
+			return routeNames;
+
+		},
+
+		/*
+		* Gets the route name based on the route pattern given
+		* @param {string} routePattern - A string that represents the route pattern e.g. "view(/pid)"
+		* @return {string} - The name of the route without any pattern special characters e.g. "view"
+		*/
+		getRouteName: function(routePattern){
+
+			var specialChars = ["/", "(", "*", ":"];
+
+			_.each(specialChars, function(specialChar){
+
+				var substring = routePattern.substring(0, routePattern.indexOf(specialChar));
+
+				if( substring && substring.length < routePattern.length ){
+					routePattern = substring;
+				}
+
+			});
+
+			return routePattern;
+
 		},
 
 		closeLastView: function(){

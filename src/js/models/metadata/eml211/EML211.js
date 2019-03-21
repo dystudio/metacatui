@@ -1509,6 +1509,16 @@ define(['jquery', 'underscore', 'backbone', 'uuid',
 
           this.addEntity(entityModel);
 
+          //If this DataONEObject fails to upload, remove the EML entity
+          this.listenTo(dataONEObject, "errorSaving", function(){
+            this.removeEntity(dataONEObject.get("metadataEntity"));
+
+            //Listen for a successful save so the entity can be added back
+            this.listenToOnce(dataONEObject, "successSaving", function(){
+              this.addEntity(dataONEObject.get("metadataEntity"))
+            });
+          });
+
       },
 
       /*
@@ -1661,12 +1671,6 @@ define(['jquery', 'underscore', 'backbone', 'uuid',
 
         textString = textString.trim();
 
-        textString = textString.replace(/&(?!(?:apos|quot|[gl]t|amp);)/g, '&amp;')
-                               .replace(/</g, '&lt;')
-                               .replace(/>/g, '&gt;')
-                               .replace(/"/g, '&quot;')
-                               .replace(/'/g, '&apos;');
-
         return textString;
 
       },
@@ -1713,6 +1717,9 @@ define(['jquery', 'underscore', 'backbone', 'uuid',
       },
 
       trickleUpChange: function(){
+        if( !MetacatUI.rootDataPackage || !MetacatUI.rootDataPackage.packageModel )
+          return;
+
         //Mark the package as changed
         MetacatUI.rootDataPackage.packageModel.set("changed", true);
       }

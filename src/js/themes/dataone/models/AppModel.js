@@ -35,6 +35,11 @@ define(['jquery', 'underscore', 'backbone'],
 			// set this variable to true, if the content being published is moderated by the data team.
 			contentIsModerated: false,
 
+      // Flag which, when true shows Whole Tale features in the UI
+      showWholeTaleFeatures: false,
+      taleEnvironments: ["RStudio", "Jupyter Notebook"],
+      dashboardUrl: 'https://girder.wholetale.org/api/v1/integration/dataone',
+
 			baseUrl: window.location.origin || (window.location.protocol + "//" + window.location.host),
 			// the most likely item to change is the Metacat deployment context
 			context: '',
@@ -45,7 +50,17 @@ define(['jquery', 'underscore', 'backbone'],
 			packageServiceUrl: null,
 			//publishServiceUrl: null,
 			authServiceUrl: null,
+
 			queryServiceUrl: null,
+
+      //If set to false, some parts of the app will send POST HTTP requests to the
+      // Solr search index via the `/query/solr` DataONE API.
+      // Set this configuration to true if using Metacat 2.10.2 or earlier
+      disableQueryPOSTs: true,
+
+      defaultSearchFilters: ["all", "attribute", "documents", "creator", "dataYear", "pubYear",
+                             "id", "taxon", "spatial", "dataSource"],
+
 			metaServiceUrl: null,
 			metacatBaseUrl: null,
 			metacatServiceUrl: null,
@@ -70,12 +85,14 @@ define(['jquery', 'underscore', 'backbone'],
 			signInUrlOrcid: null,
 			//signInUrlLdap: null,
 			tokenUrl: null,
-			mdqUrl: null,
-
-
+            //mdqBaseUrl: "https://docker-ucsb-1.dataone.org:30443/quality",
+            mdqBaseUrl: "",
+            // suidIds and suiteLables must be specified as a list, even if only one suite is available.
+            suiteIds: ["dataone.suite.1"],
+            suiteLabels: ["DataONE Metadata Completeness Suite v1.0"],
 			// Metrics endpoint url
-			metricsUrl: null,
-			
+			metricsUrl: 'https://logproc-stage-ucsb-1.test.dataone.org/metrics',
+
 			// Metrics flags for the Dataset Landing Page
 			// Enable these flags to enable metrics display
 			displayDatasetMetrics: true,
@@ -89,10 +106,30 @@ define(['jquery', 'underscore', 'backbone'],
 			displayDatasetEditButton: false,
 			displayDatasetQualityMetric: false,
 			displayDatasetAnalyzeButton: false,
-			displayMetricModals: false,
+			displayMetricModals: true,
 			displayDatasetControls: true,
+      /* Hide metrics display for SolrResult models that match the given properties.
+      *  Properties can be functions, which are given the SolrResult model value as a parameter.
+      * Example:
+      * {
+      *    formatId: "eml://ecoinformatics.org/eml-2.1.1",
+      *    isPublic: true,
+      *    dateUploaded: function(date){
+      *      return new Date(date) < new Date('1995-12-17T03:24:00');
+      *    }
+      * }
+      * This example would hide metrics for any objects that are:
+      *   EML 2.1.1 OR public OR were uploaded before 12/17/1995.
+      */
+      hideMetricsWhen: {
+        datasource: "urn:node:ESS_DIVE"
+      },
 
-			isJSONLDEnabled: true
+			isJSONLDEnabled: true,
+
+			// If true, then archived content is available in the search index.
+			// Set to false if this MetacatUI is using a Metacat version before 2.10.0
+			archivedContentIsIndexed: true
 		},
 
 		defaultView: "data",
@@ -111,6 +148,12 @@ define(['jquery', 'underscore', 'backbone'],
 			//this.set('objectServiceUrl',    this.get('baseUrl')  + this.get('d1Service') + '/object/');
 			this.set('resolveServiceUrl', this.get('d1CNBaseUrl')  + this.get('d1Service') + '/resolve/');
 			this.set('nodeServiceUrl',    this.get('baseUrl')  + this.get('d1Service') + '/node');
+
+            // Metadata quality report services
+            this.set('mdqSuitesServiceUrl', this.get("mdqBaseUrl") + "/suites/");
+            this.set('mdqRunsServiceUrl', this.get('mdqBaseUrl') + "/runs/");
+            this.set('mdqSuiteIds', this.get("suiteIds"));
+            this.set('mdqSuiteLabels', this.get("suiteLabels"));
 
 			//The logs index
 			if(typeof this.get("d1LogServiceUrl") !== "undefined"){
@@ -150,7 +193,7 @@ define(['jquery', 'underscore', 'backbone'],
 				this.set('orcidSearchUrl', this.get('orcidBaseUrl') + '/v1.1/search/orcid-bio?q=');
 
 			//The package service for v2 DataONE API
-			this.set('packageServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/packages/application%2Fbagit-097/');
+			this.set('packageServiceUrl', this.get('baseUrl') + this.get('d1Service') + '/packages/application%2Fbagit-097/');
 
 			//Only use these settings in production
 			if(this.get("baseUrl").indexOf("search.dataone.org") > -1)
@@ -162,8 +205,6 @@ define(['jquery', 'underscore', 'backbone'],
 
 			this.on("change:pid", this.changePid);
 
-
-			this.set("metricsUrl", 'https://logproc-stage-ucsb-1.test.dataone.org/metrics/filters');
 		},
 
 		changePid: function(model, name){

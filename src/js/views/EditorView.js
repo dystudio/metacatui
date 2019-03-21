@@ -180,34 +180,44 @@ define(['underscore',
             if ( typeof resourceMapIds === "undefined" || resourceMapIds === null || resourceMapIds.length <= 0 ) {
                 console.log("Resource map ids could not be found for " + scimetaModel.id);
 
-                // Create a new Data packages
-                MetacatUI.rootDataPackage = new DataPackage([this.model]);
-                MetacatUI.rootDataPackage.packageModel.set("synced", true);
+                //Check if the rootDataPackage contains the metadata document the user is trying to edit
+                if( MetacatUI.rootDataPackage && MetacatUI.rootDataPackage.pluck &&
+                  _.contains(MetacatUI.rootDataPackage.pluck("id"), this.model.get("id")) ){
 
-                //Handle the add of the metadata model
-                MetacatUI.rootDataPackage.handleAdd(this.model);
+                    //Make sure we have the latest version of the resource map before we allow editing
+                    this.listenToOnce(MetacatUI.rootDataPackage.packageModel, "latestVersionFound", function(model) {
+                      //Create a new data package for the latest version package
+                      MetacatUI.rootDataPackage = new DataPackage([this.model], { id: model.get("latestVersion") });
 
-                // Associate the science metadata with the resource map
-                if ( this.model.get && Array.isArray(this.model.get("resourceMap")) ) {
-                    this.model.get("resourceMap").push(MetacatUI.rootDataPackage.packageModel.id);
+                      //Handle the add of the metadata model
+                      MetacatUI.rootDataPackage.saveReference(this.model);
 
-                } else {
-                    this.model.set("resourceMap", MetacatUI.rootDataPackage.packageModel.id);
+                       //Fetch the data package
+                       MetacatUI.rootDataPackage.fetch();
+
+                       //Render the Data Package table
+                       this.renderDataPackage();
+                   });
+
+                   //Remove the cached system metadata XML so we retrieve it again
+                   MetacatUI.rootDataPackage.packageModel.set("sysMetaXML", null);
+                   //Find the latest version of the resource map
+                   MetacatUI.rootDataPackage.packageModel.findLatestVersion();
 
                 }
+                else{
+                  //Create a new DataPackage collection for this view
+                  this.createDataPackage();
 
-                // Set the sysMetaXML for the packageModel
-                MetacatUI.rootDataPackage.packageModel.set("sysMetaXML",
-                    MetacatUI.rootDataPackage.packageModel.serializeSysMeta());
+                  // Set the listeners
+                  this.setListeners();
 
-                // Set the listeners
-                this.setListeners();
+                  //Render the data package
+                  this.renderDataPackage();
 
-                //Render the data package
-                this.renderDataPackage();
-
-                //Render the metadata
-                this.renderMetadata();
+                  //Render the metadata
+                  this.renderMetadata();
+                }
 
             } else {
                 // Create a new data package with this id
@@ -247,6 +257,32 @@ define(['underscore',
                 this.renderDataPackage();
             }
 
+        },
+
+        /*
+        * Creates a DataPackage collection for this EditorView and sets it on the MetacatUI
+        * global object (as `rootDataPackage`)
+        */
+        createDataPackage: function(){
+          // Create a new Data packages
+          MetacatUI.rootDataPackage = new DataPackage([this.model]);
+          MetacatUI.rootDataPackage.packageModel.set("synced", true);
+
+          //Handle the add of the metadata model
+          MetacatUI.rootDataPackage.handleAdd(this.model);
+
+          // Associate the science metadata with the resource map
+          if ( this.model.get && Array.isArray(this.model.get("resourceMap")) ) {
+              this.model.get("resourceMap").push(MetacatUI.rootDataPackage.packageModel.id);
+
+          } else {
+              this.model.set("resourceMap", MetacatUI.rootDataPackage.packageModel.id);
+
+          }
+
+          // Set the sysMetaXML for the packageModel
+          MetacatUI.rootDataPackage.packageModel.set("sysMetaXML",
+              MetacatUI.rootDataPackage.packageModel.serializeSysMeta());
         },
 
         renderChildren: function(model, options) {
@@ -393,8 +429,17 @@ define(['underscore',
                 // Create a citation view and render it
                 var citationView = new CitationView({
                             model: model,
-                            title: "Untitled dataset",
-                            createLink: false });
+                            title: "Untitled dataset"
+                          });
+
+                if( model.isNew() ){
+                  citationView.createLink = false;
+                  citationView.createTitleLink = false;
+                }
+                else{
+                  citationView.createLink = false;
+                  citationView.createTitleLink = true;
+                }
 
                 this.subviews.push(citationView);
                 $("#citation-container").html(citationView.render().$el);
@@ -506,23 +551,12 @@ define(['underscore',
 
           this.toggleControls();
 
-          // Review message for themes that have contentIsModerated==true in the app config.
-          if (MetacatUI.appModel.get("contentIsModerated")) {
-              var message = this.editorSubmitMessageTemplate({
-                    themeTitle: MetacatUI.appModel.get("title"),
-                    viewURL: MetacatUI.root + "/view/" + this.model.get("id")
-                }),
-                timeout = null;
+          // Construct the save message
+          var message = this.editorSubmitMessageTemplate({
+                viewURL: MetacatUI.root + "/view/" + this.model.get("id")
+            });
 
-          }
-          else {
-              var message = $(document.createElement("div")).append(
-                  $(document.createElement("span")).text("Your changes have been submitted. "),
-                  $(document.createElement("a")).attr("href", MetacatUI.root + "/view/" + this.model.get("id")).text("View your dataset.")),
-                timeout = 4000;
-          }
-
-          MetacatUI.appView.showAlert(message, "alert-success", this.$el, timeout, {remove: true});
+          MetacatUI.appView.showAlert(message, "alert-success", this.$el, null, {remove: true});
 
           //Rerender the CitationView
           var citationView = _.where(this.subviews, { type: "Citation" });
@@ -587,15 +621,17 @@ define(['underscore',
           }
           else{
 
-            if( this.model.get("draftSaved") && MetacatUI.appModel.get("contentIsModerated") ){
-              messageParagraph.text("Not all of your changes could be submitted " +
-                "due to a technical error. But, we sent a draft of your edits to " +
-                "our support team, who will contact " +
-                "you via email as soon as possible about getting your data package submitted. ");
+            if( this.model.get("draftSaved") && MetacatUI.appModel.get("editorSaveErrorMsgWithDraft") ){
+              messageParagraph.text( MetacatUI.appModel.get("editorSaveErrorMsgWithDraft") );
               messageClasses = "alert-warning"
+            }
+            else if( MetacatUI.appModel.get("editorSaveErrorMsg") ){
+              messageParagraph.text( MetacatUI.appModel.get("editorSaveErrorMsg") );
+              messageClasses = "alert-error";
             }
             else{
               messageParagraph.text("Not all of your changes could be submitted.");
+              messageClasses = "alert-error";
             }
 
             messageParagraph.after($(document.createElement("p")).append($(document.createElement("a"))
@@ -808,17 +844,30 @@ define(['underscore',
 
         showSaving: function(){
 
-            //Change the style of the save button
-            this.$("#save-editor")
-              .html('<i class="icon icon-spinner icon-spin"></i> Submitting ...')
-              .addClass("btn-disabled");
+          //Change the style of the save button
+          this.$("#save-editor")
+            .html('<i class="icon icon-spinner icon-spin"></i> Submitting ...')
+            .addClass("btn-disabled");
 
-          this.$("input, textarea, select, button").prop("disabled", true);
+          //Get all the inputs in the Editor
+          var allInputs = this.$("input, textarea, select, button");
+
+          //Mark the disabled inputs so we can re-disable them later
+          allInputs.filter(":disabled")
+                   .addClass("disabled-saving");
+
+          //Disable all the inputs
+          allInputs.prop("disabled", true);
 
         },
 
         hideSaving: function(){
-          this.$("input, textarea, select, button").prop("disabled", false);
+          this.$("input, textarea, select, button")
+              .prop("disabled", false);
+
+          this.$(".disabled-saving, input.disabled")
+              .prop("disabled", true)
+              .removeClass("disabled-saving");
 
             //When the package is saved, revert the Save button back to normal
             this.$("#save-editor").html("Submit dataset").removeClass("btn-disabled");

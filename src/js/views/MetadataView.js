@@ -9,7 +9,6 @@ define(['jquery',
 		'collections/DataPackage',
 		'models/DataONEObject',
 		'models/PackageModel',
-		'models/NodeModel',
 		'models/SolrResult',
 		'models/metadata/ScienceMetadata',
         'models/MetricsModel',
@@ -27,6 +26,7 @@ define(['jquery',
 		'text!templates/newerVersion.html',
 		'text!templates/loading.html',
 		'text!templates/metadataControls.html',
+		'text!templates/metadataInfoIcons.html',
 		'text!templates/usageStats.html',
 		'text!templates/downloadContents.html',
 		'text!templates/alert.html',
@@ -38,10 +38,10 @@ define(['jquery',
 		'uuid',
 		'views/MetricView'
 		],
-	function($, $ui, _, Backbone, gmaps, fancybox, Clipboard, DataPackage, DataONEObject, Package, NodeModel, SolrResult, ScienceMetadata,
+	function($, $ui, _, Backbone, gmaps, fancybox, Clipboard, DataPackage, DataONEObject, Package, SolrResult, ScienceMetadata,
 			 MetricsModel, DownloadButtonView, ProvChart, MetadataIndex, ExpandCollapseList, ProvStatement, PackageTable,
 			 AnnotatorView, CitationView, MetadataTemplate, DataSourceTemplate, PublishDoiTemplate,
-			 VersionTemplate, LoadingTemplate, ControlsTemplate, UsageTemplate,
+			 VersionTemplate, LoadingTemplate, ControlsTemplate, MetadataInfoIconsTemplate, UsageTemplate,
 			 DownloadContentsTemplate, AlertTemplate, EditMetadataTemplate, DataDisplayTemplate,
 			 MapTemplate, AnnotationTemplate, metaTagsHighwirePressTemplate, uuid, MetricView) {
 	'use strict';
@@ -53,8 +53,7 @@ define(['jquery',
 
 		pid: null,
 		seriesId: null,
-        saveProvPending: false,
-		nodeModel: new NodeModel(),
+		saveProvPending: false,
 
 		model: new SolrResult(),
 		packageModels: new Array(),
@@ -81,6 +80,7 @@ define(['jquery',
 		versionTemplate: _.template(VersionTemplate),
 		loadingTemplate: _.template(LoadingTemplate),
 		controlsTemplate: _.template(ControlsTemplate),
+		infoIconsTemplate: _.template(MetadataInfoIconsTemplate),
 		dataSourceTemplate: _.template(DataSourceTemplate),
 		downloadContentsTemplate: _.template(DownloadContentsTemplate),
 		editMetadataTemplate: _.template(EditMetadataTemplate),
@@ -98,6 +98,7 @@ define(['jquery',
 			"click     .preview" 	     : "previewData",
 			"click     #save-metadata-prov" : "saveProv",
 		},
+
 
 		initialize: function (options) {
 			if((options === undefined) || (!options)) var options = {};
@@ -165,7 +166,7 @@ define(['jquery',
 
 			this.listenToOnce(model, "sync", function(){
 
-				if(this.model.get("formatType") == "METADATA"){
+				if(this.model.get("formatType") == "METADATA" || !this.model.get("formatType")){
 					this.model = model;
 					this.renderMetadata();
 				}
@@ -202,7 +203,12 @@ define(['jquery',
 				this.getPackageDetails(model.get("resourceMap"));
 
 			});
+
+      //Listen to 404 and 401 errors when we get the metadata object
 			this.listenToOnce(model, "404", this.showNotFound);
+      this.listenToOnce(model, "401", this.showIsPrivate);
+
+      //Fetch the model
 			model.getInfo();
 
 		},
@@ -217,8 +223,6 @@ define(['jquery',
 					msg: "Retrieving data set details..."
 				}));
 
-
-
 			//Insert the breadcrumbs
 			this.insertBreadcrumbs();
 			//Insert the citation
@@ -229,22 +233,18 @@ define(['jquery',
 			this.showLatestVersion();
 
 
-            // If we're displaying the metrics well then display copy citation and edit button
-            // inside the well
+			// Insert various metadata controls in the page
+			this.insertControls();
+
+      // If we're displaying the metrics well then display copy citation and edit button
+      // inside the well
 			if (MetacatUI.appModel.get("displayDatasetMetrics")) {
 				//Insert Metrics Stats into the dataset landing pages
 				this.insertMetricsControls();
 			}
-            else {
-                // Copy Citation button
-                this.insertControls();
 
-                // Edit button and the publish button
-                this.insertOwnerControls();
-            }
-
-
-
+      // Edit button and the publish button
+      this.insertOwnerControls();
 
 			//Show loading icon in metadata section
 			this.$(this.metadataContainer).html(this.loadingTemplate({ msg: "Retrieving metadata ..." }));
@@ -286,7 +286,7 @@ define(['jquery',
 								viewRef.$(viewRef.metadataContainer).html(response);
 
 								//If there is no info from the index and there is no metadata doc rendered either, then display a message
-								if(viewRef.$el.is(".no-stylesheet") && !viewRef.model.get("indexed"))
+								if(viewRef.$el.is(".no-stylesheet") && viewRef.model.get("archived") && !viewRef.model.get("indexed"))
 									viewRef.$(viewRef.metadataContainer).prepend(viewRef.alertTemplate({ msg: "There is limited metadata about this dataset since it has been archived." }));
 
 								viewRef.alterMarkup();
@@ -397,7 +397,7 @@ define(['jquery',
 						      .append($(document.createElement("li"))
 						    		  .addClass("home")
 						    		  .append($(document.createElement("a"))
-						    				  .attr("href", MetacatUI.root)
+						    				  .attr("href", MetacatUI.root || "/")
 						    				  .addClass("home")
 						    				  .text("Home")))
 		    				  .append($(document.createElement("li"))
@@ -426,24 +426,70 @@ define(['jquery',
 			this.$(this.breadcrumbContainer).html(breadcrumbs);
 		},
 
-		showNotFound: function(){
-			//If we haven't checked the logged-in status of the user yet, wait a bit until we show a 404 msg, in case this content is their private content
-			if(!MetacatUI.appUserModel.get("checked")){
-				this.listenToOnce(MetacatUI.appUserModel, "change:checked", this.showNotFound);
-				return;
-			}
+    /*
+    * When the metadata object doesn't exist, display a message to the user
+    */
+    showNotFound: function(){
 
-			if(!this.model.get("notFound")) return;
+      //If the model was found, exit this function
+      if(!this.model.get("notFound")){
+        return;
+      }
 
-			var msg = "<h4>Nothing was found for one of the following reasons:</h4>" +
-					  "<ul class='indent'>" +
-					  	  "<li>The ID '" + this.pid  + "' does not exist.</li>" +
-						  '<li>This may be private content. (Are you <a href="<%= MetacatUI.root %>/signin">signed in?</a>)</li>' +
-						  "<li>The content was removed because it was invalid.</li>" +
-					  "</ul>";
-			this.hideLoading();
-			this.showError(msg);
-		},
+      //Construct a message that shows this object doesn't exist
+      var msg = "<h4>Nothing was found.</h4>" +
+            "<p>The dataset identifier '" + this.model.get("id") + "' " +
+            "does not exist or it may have been removed. <a href='" +
+            MetacatUI.root + "/data/query=" + encodeURIComponent(this.model.get("id")) + "'>Search for " +
+            "datasets that mention " + this.model.get("id") + "</a></p>";
+
+      //Remove the loading message
+      this.hideLoading();
+
+      //Show the not found error message
+      this.showError(msg);
+    },
+
+    /*
+    * When the metadata object is private, display a message to the user
+    */
+    showIsPrivate: function(){
+
+      //If we haven't checked the logged-in status of the user yet, wait a bit
+      //until we show a 401 msg, in case this content is their private content
+      if(!MetacatUI.appUserModel.get("checked")){
+        this.listenToOnce(MetacatUI.appUserModel, "change:checked", this.showIsPrivate);
+        return;
+      }
+
+      //If the user is logged in, the message will display that this dataset is private.
+      if( MetacatUI.appUserModel.get("loggedIn") ){
+        var msg = '<span class="icon-stack private tooltip-this" data-toggle="tooltip"' +
+                  'data-placement="top" data-container="#metadata-controls-container"' +
+                  'title="" data-original-title="This is a private dataset.">' +
+                    '<i class="icon icon-circle icon-stack-base private"></i>' +
+                    '<i class="icon icon-lock icon-stack-top"></i>' +
+                  '</span> This is a private dataset.';
+      }
+      //If the user isn't logged in, display a log in link.
+      else{
+        var msg = '<span class="icon-stack private tooltip-this" data-toggle="tooltip"' +
+                  'data-placement="top" data-container="#metadata-controls-container"' +
+                  'title="" data-original-title="This is a private dataset.">' +
+                    '<i class="icon icon-circle icon-stack-base private"></i>' +
+                    '<i class="icon icon-lock icon-stack-top"></i>' +
+                  '</span> This is a private dataset. If you believe you have permission ' +
+                  'to access this dataset, then <a href="' + MetacatUI.root +
+                  '/signin">sign in</a>.';
+      }
+
+      //Remove the loading message
+      this.hideLoading();
+
+      //Show the not found error message
+      this.showError(msg);
+
+    },
 
 		getPackageDetails: function(packageIDs){
 			var viewRef = this;
@@ -482,6 +528,9 @@ define(['jquery',
 
 					//Save the package in the view
 					viewRef.packageModels.push(thisPackage);
+
+					//Make sure we get archived content, too
+					thisPackage.set("getArchivedMembers", true);
 
 					//Get the members
 					thisPackage.getMembers({getParentMetadata: true });
@@ -615,7 +664,8 @@ define(['jquery',
 				currentlyViewing: this.pid,
 				parentView: this,
 				title: title,
-				nested: nested
+				nested: nested,
+				metricsModel: this.metricsModel
 			});
 
 			//Get the package table container
@@ -862,22 +912,18 @@ define(['jquery',
 				viewRef = this;
 
 			this.listenToOnce(this.model, "change:isAuthorized", function(){
-				if(!model.get("isAuthorized")) return false;
-
-				//Insert the controls container
-				var controlsEl = $(document.createElement("div")).addClass("authority-controls inline-buttons");
-				$(container).html(controlsEl);
+				if(!model.get("isAuthorized") || model.get("archived")) return false;
 
 				//Insert an Edit button
 				if( _.contains(MetacatUI.appModel.get("editableFormats"), this.model.get("formatId")) ){
-					controlsEl.append(
+					container.append(
 						this.editMetadataTemplate({
 							identifier: pid,
 							supported: true
 						}));
 				}
 				else{
-					controlsEl.append(this.editMetadataTemplate({
+					container.append(this.editMetadataTemplate({
 						supported: false
 					}));
 				}
@@ -885,7 +931,7 @@ define(['jquery',
 				//Insert a Publish button if its not already published with a DOI
 				if(!model.isDOI()){
 					//Insert the template
-					controlsEl.append(
+					container.append(
 						viewRef.doiTemplate({
 							isAuthorized: true,
 							identifier: pid
@@ -954,17 +1000,29 @@ define(['jquery',
 		 * - A "Copy Citation" button to copy the citation text
 		 */
 		insertControls: function(){
+
 			//Get template
 			var controlsContainer = this.controlsTemplate({
 					citation: $(this.citationContainer).text(),
 					url: window.location,
-					mdqUrl: MetacatUI.appModel.get("mdqUrl"),
+          mdqUrl: MetacatUI.appModel.get("mdqBaseUrl"),
+          showWholetale: MetacatUI.appModel.get("showWholeTaleFeatures"),
 					model: this.model.toJSON()
 				});
 
 			$(this.controlsContainer).html(controlsContainer);
 
 			var view = this;
+
+			//Insert the info icons
+			var metricsWell = this.$(".metrics-container");
+			metricsWell.append( this.infoIconsTemplate({
+				model: this.model.toJSON()
+			}) );
+
+			if(MetacatUI.appModel.get("showWholeTaleFeatures")) {
+        this.createWholeTaleButton ();
+      }
 
 			//Create clickable "Copy" buttons to copy text (e.g. citation) to the user's clipboard
 			var copyBtns = $(this.controlsContainer).find(".copy");
@@ -1022,19 +1080,45 @@ define(['jquery',
 			this.$(".tooltip-this").tooltip();
 		},
 
+    /**
+     *Creates a button which the user can click to launch the package in Whole Tale
+    */
+   createWholeTaleButton: function() {
+    let self=this;
+    MetacatUI.appModel.get('taleEnvironments').forEach(function(environment){
+      var queryParams=
+      '?uri='+ self.model.id +
+      '&title='+encodeURIComponent(self.model.get("title"))+
+      '&environment='+environment;
+      var composeUrl = MetacatUI.appModel.get('dashboardUrl')+queryParams;
+      var anchor = $('<a>');
+      anchor.attr('href',composeUrl).append(
+        $('<span>').attr('class', 'tab').append(environment));
+      anchor.attr('target', '_blank');
+      $('.analyze.dropdown-menu').append($('<li>').append(anchor));
+      });
+    },
+
 		// Inserting the Metric Stats
 		insertMetricsControls: function() {
-            var metricsModel = new MetricsModel({pid: this.pid})
-            metricsModel.fetch()
 
-			var self = this;
+      //Exit if metrics shouldn't be shown for this dataset
+      if( this.model.hideMetrics() ){
+        return;
+      }
+
+
+			var pid_list = [];
+			pid_list.push(this.pid);
+			var metricsModel = new MetricsModel({pid_list: pid_list, type: "dataset"});
+			metricsModel.fetch();
+			this.metricsModel = metricsModel;
+
 			// Retreive the model from the server for the given PID
 			// TODO: Create a Metric Request Object
 
-			var metrics = $(document.createElement("div")).addClass("metric-well well well-lg");
-
 			if (MetacatUI.appModel.get("displayDatasetMetrics")) {
-				var buttonToolbar = $(document.createElement("div")).addClass("metric-toolbar btn-toolbar");
+				var buttonToolbar = this.$(".metrics-container");
 
 				if (MetacatUI.appModel.get("displayDatasetCitationMetric")) {
 					var citationsMetricView = new MetricView({metricName: 'Citations', model: metricsModel});
@@ -1051,11 +1135,10 @@ define(['jquery',
 					buttonToolbar.append(viewsMetricView.render().el);
 				}
 
-				metrics.append(buttonToolbar);
 			}
 
 
-            if(MetacatUI.appModel.get("displayDatasetControls")) {
+    /*        if(MetacatUI.appModel.get("displayDatasetControls")) {
                 var controlsToolbar = $(document.createElement("div")).addClass("edit-toolbar btn-toolbar");
                 var copyCitationToolbar = this.$(this.controlsContainer);
 
@@ -1073,9 +1156,10 @@ define(['jquery',
 
 				metrics.append(controlsToolbar);
             }
+*/
 
-			self.$(self.tableContainer).before(metrics);
 		},
+
 
         // Check if the DataPackage provenance parsing has completed.
         checkForProv: function() {
@@ -1111,7 +1195,13 @@ define(['jquery',
 			//var isAuthorized = true;
 			var editModeOn = false;
 
+			//If the user is authorized to edit this metadata doc, then turn edit mode on
 			this.model.get("isAuthorized") ? editModeOn = true : editModeOn = false;
+			//If this content is archived, then turn edit mode off
+			if( this.model.get("archived") ){
+				editModeOn = false;
+			}
+
 			var view = this;
 			//Draw two flow charts to represent the sources and derivations at a package level
 			var packageSources     = dataPackage.sourcePackages;
@@ -1146,6 +1236,10 @@ define(['jquery',
 					// Don't draw prov charts for metadata objects.
 					if(member.get("type").toLowerCase() == "metadata") return;
 					var entityDetailsSection = view.findEntityDetailsContainer(member.get("id"));
+
+					if( !entityDetailsSection ){
+						return;
+					}
 
 					//Retrieve the sources and derivations for this member
 					var memberSources 	  = member.get("provSources") || new Array(),
@@ -1625,7 +1719,9 @@ define(['jquery',
 
 					//Insert the data display HTML and the anchor tag to mark this spot on the page
 					if(container){
-						if((type == "image") || (type == "PDF")){
+
+						//Only show data displays for images and PDFs hosted on the same origin
+						if((type == "image") || ((type == "PDF") && solrResult.get("url").indexOf(window.location.host) > -1) ){
 
 							//Create the data display HTML
 							var dataDisplay = $.parseHTML(viewRef.dataDisplayTemplate({
@@ -1916,7 +2012,7 @@ define(['jquery',
 
 							if (identifier) {
 								viewRef.hideLoading();
-								var msg = "Published data package '" + identifier + "'. If you are not redirected soon, you can view your <a href='" + MetcatUI.root + "/view/" + identifier + "'>published data package here</a>";
+								var msg = "Published data package '" + identifier + "'. If you are not redirected soon, you can view your <a href='" + MetacatUI.root + "/view/" + identifier + "'>published data package here</a>";
 								viewRef.$el.find('.container').prepend(
 										viewRef.alertTemplate({
 											msg: msg,
@@ -1972,6 +2068,12 @@ define(['jquery',
 
 		// this will lookup the latest version of the PID
 		showLatestVersion: function() {
+
+      //If this metadata doc is not obsoleted by a new version, then exit the function
+      if( !this.model.get("obsoletedBy") ){
+        return;
+      }
+
 			var view = this;
 
 			//When the latest version is found,
@@ -1979,8 +2081,15 @@ define(['jquery',
 				//Make sure it has a newer version, and if so,
 				if(view.model.get("newestVersion") != view.model.get("id"))
 					//Put a link to the newest version in the content
-					view.$el.prepend(view.versionTemplate({pid: view.model.get("newestVersion")}));
+					view.$(".newer-version").replaceWith(view.versionTemplate({
+            pid: view.model.get("newestVersion")
+          }));
 			});
+
+      //Insert the newest version template with a loading message
+      this.$el.prepend( this.versionTemplate({
+        loading: true
+      }) );
 
 			//Find the latest version of this metadata object
 			this.model.findLatestVersion();
@@ -2181,7 +2290,7 @@ define(['jquery',
 		 * Generate a string appropriate to be used as the publication date in a
 		 * dataset citation.
 		 */
-		getDatePublishedText() {
+		getDatePublishedText: function() {
 			// Dataset/datePublished
 			// Prefer pubDate, fall back to dateUploaded so we have something to show
 			if (this.model.get("pubDate") !== "") {
@@ -2206,14 +2315,6 @@ define(['jquery',
 			var href = document.location.href,
 					route = href.replace(document.location.origin + "/", "")
 					            .split("/")[0];
-			// Citation
-			var citationParts = [
-						this.getAuthorText(),
-						new Date(this.getDatePublishedText()).getUTCFullYear().toString(),
-						model.get("title"),
-						this.getPublisherText(),
-						model.get("id")],
-				  citationText = citationParts.join(". ") + ".";
 
 			// First: Create a minimal Schema.org Dataset with just the fields we
 			// know will come back from Solr (System Metadata fields).
@@ -2243,23 +2344,6 @@ define(['jquery',
 			// Creator
 			if (model.get("origin")) {
 				elJSON["creator"] = model.get("origin")
-			}
-
-			// Citation
-			//
-			// I made this optional because there are rare cases where a metadata
-			// standard doesn't have creators or titles
-
-			// Returns 1 if all citationParts are non-zero-length
-			// Returns 0 if any are zero length
-			var isCitationValid = citationParts.map(function(p) {
-				return (typeof p === "string" && p.length > 0 ? true : false)
-			}).reduce(function(acc, val) {
-				return acc * val;
-			});
-
-			if (isCitationValid) {
-				elJSON['citation'] = citationText;
 			}
 
 			// Dataset/spatialCoverage

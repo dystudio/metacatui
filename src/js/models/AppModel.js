@@ -32,8 +32,10 @@ define(['jquery', 'underscore', 'backbone'],
 
 			maxDownloadSize: 3000000000,
 
-			// set this variable to true, if the content being published is moderated by the data team.
-			contentIsModerated: false,
+      // Flag which, when true shows Whole Tale features in the UI
+      showWholeTaleFeatures: false,
+      taleEnvironments: ["RStudio", "Jupyter Notebook"],
+      dashboardUrl: 'https://girder.wholetale.org/api/v1/integration/dataone',
 
 			/*
 			 * emlEditorRequiredFields is a hash map of all the required fields in the EML Editor.
@@ -57,13 +59,19 @@ define(['jquery', 'underscore', 'backbone'],
 
 			editableFormats: ["eml://ecoinformatics.org/eml-2.1.1"],
 
+      //These error messages are displayed when the Editor encounters an error saving
+      editorSaveErrorMsg: "Not all of your changes could be submitted.",
+      editorSaveErrorMsgWithDraft: "Not all of your changes could be submitted, but a draft " +
+        "has been saved which can be accessed by our support team. Please contact us.",
+
 			defaultAccessPolicy: [],
 
-			baseUrl: window.location.origin || (window.location.protocol + "//" + window.location.host),
+			baseUrl: "https://dev.nceas.ucsb.edu",//window.location.origin || (window.location.protocol + "//" + window.location.host),
+			allowAccessPolicyChanges: true,
 			// the most likely item to change is the Metacat deployment context
 			context: '/metacat',
 			d1Service: '/d1/mn/v2',
-			d1CNBaseUrl: "https://cn.dataone.org/",
+			d1CNBaseUrl: "https://cn-stage-2.test.dataone.org/",
 			d1CNService: "cn/v2",
 			d1LogServiceUrl: null,
 			nodeServiceUrl: null,
@@ -71,8 +79,17 @@ define(['jquery', 'underscore', 'backbone'],
 			packageServiceUrl: null,
 			publishServiceUrl: null,
 			authServiceUrl: null,
-			queryServiceUrl: null,
-			metaServiceUrl: null,
+
+      queryServiceUrl: null,
+
+      //If set to false, some parts of the app will send POST HTTP requests to the
+      // Solr search index via the `/query/solr` DataONE API.
+      // Set this configuration to true if using Metacat 2.10.2 or earlier
+      disableQueryPOSTs: false,
+
+      defaultSearchFilters: ["all", "attribute", "documents", "creator", "dataYear", "pubYear", "id", "taxon", "spatial"],
+
+      metaServiceUrl: null,
 			metacatBaseUrl: null,
 			metacatServiceUrl: null,
 			objectServiceUrl: null,
@@ -97,7 +114,7 @@ define(['jquery', 'underscore', 'backbone'],
 			mdqUrl: null,
 
 			// Metrics endpoint url
-			metricsUrl: null,
+			metricsUrl: 'https://logproc-stage-ucsb-1.test.dataone.org/metrics',
 
 			// Metrics flags for the Dataset Landing Page
 			// Enable these flags to enable metrics display
@@ -112,10 +129,31 @@ define(['jquery', 'underscore', 'backbone'],
 			displayDatasetEditButton: true,
 			displayDatasetQualityMetric: false,
 			displayDatasetAnalyzeButton: false,
-			displayMetricModals: false,
+			displayMetricModals: true,
 			displayDatasetControls: true,
+      /* Hide metrics display for SolrResult models that match the given properties.
+      *  Properties can be functions, which are given the SolrResult model value as a parameter.
+      * Example:
+      * {
+      *    formatId: "eml://ecoinformatics.org/eml-2.1.1",
+      *    isPublic: true,
+      *    dateUploaded: function(date){
+      *      return new Date(date) < new Date('1995-12-17T03:24:00');
+      *    }
+      * }
+      * This example would hide metrics for any objects that are:
+      *   EML 2.1.1 OR public OR were uploaded before 12/17/1995.
+      */
+      hideMetricsWhen: null,
 
-			isJSONLDEnabled: true
+			isJSONLDEnabled: true,
+
+			// A lookup map of project names to project seriesIds
+			projectsMap: {},
+
+			// If true, then archived content is available in the search index.
+			// Set to false if this MetacatUI is using a Metacat version before 2.10.0
+			archivedContentIsIndexed: true
 		},
 
 		defaultView: "data",
@@ -199,10 +237,6 @@ define(['jquery', 'underscore', 'backbone'],
 				if(typeof this.get("orcidBaseUrl") != "undefined")
 					this.set('orcidSearchUrl', this.get('orcidBaseUrl') + '/search/orcid-bio?q=');
 
-				//Turn the provenance features on
-				if(typeof this.get("prov") != "undefined")
-					this.set("prov", true);
-
 				//Turn the seriesId feature on
 				if(typeof this.get("useSeriesId") != "undefined")
 					this.set("useSeriesId", true);
@@ -213,7 +247,6 @@ define(['jquery', 'underscore', 'backbone'],
 
 			this.on("change:pid", this.changePid);
 
-			this.set("metricsUrl", 'https://logproc-stage-ucsb-1.test.dataone.org/metrics/filters');
 
 		},
 

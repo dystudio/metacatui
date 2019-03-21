@@ -405,7 +405,7 @@ require.config({
   map: MetacatUI.themeMap,
   urlArgs: "v=" + MetacatUI.cacheBuster,
   paths: {
-    jquery: 'https://code.jquery.com/jquery-1.9.1.min',
+    jquery: '/components/jquery-1.9.1.min',
     jqueryui: MetacatUI.root + '/components/jquery-ui.min',
     jqueryform: MetacatUI.root + '/components/jquery.form',
     underscore: MetacatUI.root + '/components/underscore-min',
@@ -425,16 +425,32 @@ require.config({
     md5: MetacatUI.root + '/components/md5',
     rdflib: MetacatUI.root + '/components/rdflib.min',
     x2js: MetacatUI.root + '/components/xml2json',
+    he: MetacatUI.root + '/components/he',
+	// showdown + extensions (used in the markdownView to convert markdown to html)
+	showdown: MetacatUI.root + '/components/showdown/showdown.min',
+	showdownHighlight: MetacatUI.root + '/components/showdown/extensions/showdown-highlight/showdown-highlight',
+	highlight: MetacatUI.root + '/components/showdown/extensions/showdown-highlight/highlight.pack',
+	showdownFootnotes: MetacatUI.root + '/components/showdown/extensions/showdown-footnotes',
+	showdownBootstrap: MetacatUI.root + '/components/showdown/extensions/showdown-bootstrap',
+	showdownDocbook: MetacatUI.root + '/components/showdown/extensions/showdown-docbook',
+	showdownKatex: MetacatUI.root + '/components/showdown/extensions/showdown-katex/showdown-katex.min',
+	citation: MetacatUI.root + '/components/showdown/extensions/showdown-citation/citation-0.4.0-9.min',
+	showdownCitation:  MetacatUI.root + '/components/showdown/extensions/showdown-citation/showdown-citation',
+	showdownImages:  MetacatUI.root + '/components/showdown/extensions/showdown-images',
+	showdownXssFilter: MetacatUI.root + '/components/showdown/extensions/showdown-xss-filter/showdown-xss-filter',
+	xss: MetacatUI.root + '/components/showdown/extensions/showdown-xss-filter/xss.min',
+	showdownHtags: MetacatUI.root + '/components/showdown/extensions/showdown-htags',
 	//Have a null fallback for our d3 components for browsers that don't support SVG
 	d3: MetacatUI.d3URL,
 	LineChart: ['views/LineChartView', null],
 	BarChart: ['views/BarChartView', null],
 	CircleBadge: ['views/CircleBadgeView', null],
-	DonutChart: ['views/DonutChartView', null]
+	DonutChart: ['views/DonutChartView', null],
+	MetricsChart: ['views/MetricsChartView', null],
   },
   shim: { /* used for libraries without native AMD support */
     underscore: {
-      exports: '_'
+      exports: '_',
     },
     backbone: {
       deps: ['underscore', 'jquery'],
@@ -465,7 +481,13 @@ require.config({
     },
     rdflib: {
         exports: 'rdf'
-    }
+    },
+	xss: {
+		exports: 'filterXSS'
+	},
+	citation: {
+		exports: 'Cite'
+	}
   }
 });
 
@@ -617,7 +639,14 @@ function(Bootstrap, AppView, AppModel) {
 			// Stop if the click happened on an a w/o an href
 			// This is kind of a weird edge case where. This could be removed if
 			// we remove these instances from the codebase
-			if (typeof href === "undefined" || typeof href.attr === "undefined") {
+			if (typeof href === "undefined" || typeof href.attr === "undefined" ||
+					href.attr === "") {
+				return;
+			}
+
+			//Don't route to URLs with the DataONE API, which are sometimes proxied
+			// via Apache ProxyPass so start with the MetacatUI origin
+			if( href.attr.indexOf("/cn/v2/") > 0 || href.attr.indexOf("/mn/v2/") > 0 ){
 				return;
 			}
 
@@ -626,12 +655,15 @@ function(Bootstrap, AppView, AppModel) {
 			// attribute of the clicked element so Backbone.history.navigate works.
 			// Note that a RegExp was used here to anchor the .replace call to the
 			// front of the string so that this code works when MetacatUI.root is "".
-			var route = href.attr.replace(new RegExp("^" + MetacatUI.root + "/"), "")
+			var route = href.attr.replace(new RegExp("^" + MetacatUI.root + "/"), "");
 
 			// Catch routes hrefs that start with # and don't do anything with them
 			if (href.attr.indexOf("#") == 0) { return; }
 
-			if (href.prop && href.prop.slice(0, root.length) === root) {
+			//If the URL is not a route defined in the app router, then follow the link
+			//If the URL is not at the MetacatUI root, then follow the link
+			if (href.prop && href.prop.slice(0, root.length) === root &&
+					_.contains(MetacatUI.uiRouter.getRouteNames(), MetacatUI.uiRouter.getRouteName(route))) {
 				evt.preventDefault();
 				Backbone.history.navigate(route, true);
 			}

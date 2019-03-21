@@ -425,6 +425,14 @@ img.icon{
 	font-weight: bold;
 	font-size: .9em;
 }
+.private.icon-stack .icon-circle{
+  color: #FF7600;
+}
+.private.icon-stack .icon-stack-top{
+  color: #FFF;
+  margin-top: -1px;
+  font-size: 1.1em;
+}
 /******************************************
 ** Results and Result Rows ***
 ******************************************/
@@ -434,9 +442,6 @@ img.icon{
 	 width: 95%;
 	 width: calc(100% - 15px);
 	 border-top: 1px solid #EEE;
-}
-.result-row .info-icons{
-	margin-top: 10px;
 }
 .result-row .info-icons .icons{
 	float: left;
@@ -459,9 +464,6 @@ img.icon{
 .result-row .info-icons .icons.download .tooltip{
 	width: 120px;
 }
-.result-row .info-icons .icon{
-	cursor: default;
-}
 .result-row .info-icons .icon.views{
   margin-left: 5px;
   color: inherit;
@@ -473,7 +475,6 @@ img.icon{
 	height: 1em;
 }
 .info-icons .icon.private{
-	font-size: 1.5em;
 	color: #FF7600;
 }
 .result-row .info-icons .label{
@@ -1503,11 +1504,13 @@ img.icon{
 }
 .metadata-view .controls-container{
 	margin-bottom: 20px;
+	padding: 10px;
 }
 .metadata-view .controls-container > .controls{
-	display: inline;
-	float: left;
-	margin-right: 20px;
+	display: inline-block;
+	float: right;
+	margin-top: 0px;
+	margin-bottom: 0px;
 }
 .metadata-view .controls-container > .controls .inline-buttons{
 	margin-top: 0px;
@@ -1548,22 +1551,15 @@ body > .alert-container {
 #Content.no-stylesheet > .breadcrumb~.citation{
 	margin-top: 20px;
 }
-
-.attributeList > .row-fluid > .span2 {
-  min-width: 130px;
-  max-width: 150px;
-  max-width: calc(165px - 2.127659574468085%);
-  max-height: 700px;
-  overflow-y: scroll;
+/* Padding at the bottom to avoid scrollbar overlap */
+#attributeTabs{
+  padding-bottom: 25px;
 }
-.tab-content,
-.row-fluid .tab-content.span10{
-	width: 76%;
-	width: calc(100% - 165px);
+.attributeList > .row-fluid > .span2 {
+  max-height: 700px;
+  overflow: scroll;
 }
 .attributeList a{
-	text-overflow: ellipsis;
-	overflow: hidden;
 	white-space: nowrap;
 	max-width: 100%;
 }
@@ -1592,6 +1588,36 @@ body > .alert-container {
 .taxonomicCoverage .controls {
 	margin-left: 0px;
 }
+
+/* ---- Analyze Button ---- */
+div.dropdown.btn.btn-secondary.dropdown-toggle .icon-bar-chart
+{
+	margin-right: 10px;
+}
+#metadata-controls-container > div.controls.btn-toolbar > div > button > span.analyze-text {
+	margin-right:10px;
+	font-weight: 600;
+}
+div.analyze.dropdown{
+	display: inline-block;
+}
+div.analyze.dropdown.open button.dropdown.btn.btn-secondary.dropdown-toggle{
+	display: inline-block;
+	color:white;
+	text-shadow: 0;
+	background-color: #1C6E84;
+	border-width: 0px;
+}
+.controls.btn-toolbar{
+	font-size: 1em;
+}
+.analyze.dropdown-menu {
+	border: none;
+	border-radius: 4px;
+	padding: 0px;
+	margin: 0px;
+}
+
 /**----------------------------------------**/
 .metadata-view .citation{
 	margin-bottom: 20px;
@@ -1605,12 +1631,29 @@ body > .alert-container {
   float: right;
   margin-bottom: 10px;
 }
-.metadata-controls-container .info-icons{
+.controls-container .info-icons{
 	display: inline-block;
-	padding-left: 20px;
-	font-size: 1.2em;
-	top: 5px;
-    position: relative;
+	margin-left: 10px;
+	margin-right: 20px;
+	vertical-align: top;
+	position: relative;
+	font-size: 30px;
+}
+.controls-container .info-icons .icon-stack{
+	width: 1.25em;
+  height: 1.25em;
+  vertical-align: top;
+}
+.controls-container .info-icons .icon-stack .icon {
+	margin-top: -15px;
+}
+.controls-container .info-icons .icon-stack .icon-stack-top{
+	color: #FFF;
+	font-size: .75em;
+	margin-top: -15px;
+}
+.controls-container .info-icons .icon-stack .icon-stack-base{
+	font-size: 1.25em;
 }
 .metadata-controls-container{
 	position: relative;
@@ -1640,74 +1683,41 @@ body > .alert-container {
 /******************************************
 * Metrics Controller Styling
 ********************************************/
-/* Style for the metric button */
-
+.metrics-container{
+	display: inline-block;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
 
 /***********
 Defult button styling for Metrics views
 ***********/
-/* a.btn.metrics {
-    display: inline-block;
-    width: 164px;
-    padding-right: 0px;
-    margin-top: -14px;
-    margin-left: -5px;
-    color: #555;
-    border-color: #C3C3C3;
-    background-color: #FFFFFF;
-    cursor: default;
-}
-.metric-value.badge {
-    float: right;
-    color: #FFFFFF;
-    background-color: #555;
-    margin-top: 2px;
-}
-.metric-icon {
-    margin-right: 10px;
-    float: left;
-}
-.metric-name {
-    float: left;
-}
-.metric-value {
-    float: right;
-} */
-
-
-/***********
-Non-clickable button styling for metrics views
-***********/
 a.btn.metrics {
-    display: inline-block;
-    width: auto;
-    padding-right: 0px;
-    margin-top: -14px;
-    margin-left: -5px;
-    color: #555;
-    background-color: #F3F3F3;
-    cursor: default;
-    border: none;
-    box-shadow: none;
-
+    width: 164px;
+		margin-bottom: 0px;
+}
+.metric-value > .icon.metric-icon {
+    font-size:  18px;
 }
 .metric-value.badge {
     float: right;
-    color: #F3F3F3;
-    background-color: #555;
+    background-color: #333;
     margin-top: 2px;
 }
 .metric-icon {
     margin-right: 10px;
     float: left;
+	padding-top: 1px;
 }
 .metric-name {
     float: left;
-    margin-right: 10px;
 }
 .metric-value {
     float: right;
 }
+
+
+
 
 i.icon.icon-cloud-download {
     font-size: 1.2em; !important;
@@ -1730,73 +1740,364 @@ i.icon.metric-icon.icon-spinner.icon-spin {
     float: left;
     width: auto;
 }
-.edit-toolbar {
+.controls-container .controls {
     border-left: 1px solid #E3E3E3;
     float: right;
-    margin-top: -15px;
-    width: auto;
-    height: 50px;
-
+		padding-left: 10px;
 }
-
-.edit-toolbar >
-#metadata-controls-container >
-.metadata-controls-container {
-    margin-left: 15px;
-    margin-top: 10px;
-    margin-right: -10px;
-    width: auto;
-    height: 38px;
-    display: inline-block;
-    position: relative;
+.controls .btn{
+	margin-bottom: 0px;
 }
-
-.edit-toolbar >
-#owner-controls-container >
-.authority-controls {
-    width: auto;
-    height: 38px;
-    margin-top: -38px;
-    margin-right: -20px;
-    margin-left: 170px;
-}
-
-.edit-toolbar >
-#owner-controls-container >
-.authority-controls >
-#editMetadata {
-    margin-right: 15px;
-}
-
-/* .edit-toolbar >
-#metadata-controls-container.controls >
-.metadata-controls-container >
-.copy-success{
-	position: absolute;
-    top: -24px;
-    left: 17px;
-    font-size: .9em;
-} */
-
-
 /* Making the publish button consistent size as the downloads all*/
-.edit-toolbar >
-#owner-controls-container >
-.authority-controls >
-#publish {
+#owner-controls-container > .btn {
+    margin-right: 10px;
+}
+.edit-toolbar > #owner-controls-container #publish {
     width: 138px;
 }
 
-/* Disabling the hover features of the button for a while. Once, the Modals are ready, we'll enable
-these effects
-a.btn.metrics:hover .metric-value.badge {
+#metric-modal {
+    z-index: 1050;
+    top: 15%;
+    width: 930px;
+    height: 500px;
+    left: 40%;
+}
+#metric-modal .modal-content {
+    width: auto;
+}
+
+#metric-modal .modal-header {
+    width: 900px;
+    height: 25px;
+}
+
+#metric-modal .modal-body {
+    width: 100%;
+    height: 400px;
+    max-height: 400px;
+    padding: 0px;
+}
+
+#metric-modal .modal-footer {
+    width: 900px;
+    height: 25px;
+	padding-top: 18px;
+}
+
+#metric-modal .modal-header .icon {
+	padding: 0px 9px;
+}
+
+#metric-modal .modal-header .left-header-section {
+	float: left;
+	width: 90%;
+	margin-top: 3px;
+}
+
+#metric-modal .modal-header .right-header-section {
+	float: right;
+	width: 10%;
+}
+
+#metric-modal .modal-body .modal-description {
+	float: left;
+	width: 236px;
+	padding-left: 30px;
+	padding-top: 33px;
+}
+
+#metric-modal .modal-body .modal-description p {
+	margin: 0 0 25px;
+}
+
+#metric-modal .modal-body .modal-description p#slider-instructions {
+	margin-top: 109px;
+	margin-bottom: 0;
+}
+
+#metric-modal .modal-body .metric-chart {
+	float: right;
+	width: 600px;
+	padding-right: 18px;
+	padding-top: 22px;
+}
+
+
+/******************************************
+* Search Page / Data Catalog Page Metrics
+******************************************/
+.catalog-metrics .badge {
+	background-color: #dedede;
+	color: #666;
+}
+i.catalog-metric-icon {
+	margin-right: 3px;
+}
+
+/**********************************************************
+*	  Metric Modal Chart (Views, Downloads, Citations)	  *
+***********************************************************/
+
+
+/*
+============ GENERAL CHART TEXT STYLE ===========		[metric modal chart]
+*/
+
+#metric-modal .metric-chart text {
+	fill: #565656;
+	font-size: 9px;
+	font-family: Helvetica, Arial, "sans serif";
+}
+
+/*
+============ WHEN THERE IS NO DATA: ===========		[metric modal chart]
+*/
+
+#metric-modal .metric-chart text.no-data {
+	font-size: 16px;
+	font-weight: 100;
+	fill:#d0d0d0;
+}
+
+#metric-modal .metric-chart rect.no-data {
+	fill: #f5f5f5;
+}
+
+/*
+	============ WHEN THERE IS DATA: ===========		[metric modal chart]
+*/
+
+/*
+	--- AXES ---		[metric modal chart]
+*/
+
+/* --- x axis focus --- */
+
+#metric-modal .metric-chart .focus .axis {
+	shape-rendering: crispEdges;
+}
+
+#metric-modal .metric-chart .focus .x.axis {
+	clip-path: url(#clip);
+}
+
+#metric-modal .metric-chart .focus .x.axis line {
+	display: none;
+}
+
+#metric-modal .metric-chart .focus .x.axis .tick:hover {
+	cursor: default;
+}
+
+
+/* --- x axis context --- */
+
+#metric-modal .metric-chart .context .x.axis line {
+	display: none;
+}
+
+#metric-modal .metric-chart .context .x.axis {
+	clip-path: url(#clip);
+}
+
+#metric-modal .metric-chart .context .x.axis .domain {
+	display:none;
+}
+
+/* --- focus y-axis --- */
+
+#metric-modal .metric-chart .focus .y.axis .domain {
+	display: none;
+}
+
+#metric-modal .metric-chart .y.axis.title {
+	font-size: 13px;
+	font-weight: 100;
+}
+
+/* horizontal focus gridlines */
+#metric-modal .metric-chart .y.axis line {
+	stroke: #565656;
+	stroke-dasharray: 2,2;
+	stroke-opacity: 0.3;
+}
+
+/*
+	--- BRUSH ---		[metric modal chart]
+*/
+
+/* --- brush window --- */
+
+#metric-modal .metric-chart .brush .extent {
+  fill-opacity: .07;
+  shape-rendering: crispEdges;
+  clip-path: url(#clip);
+  fill: #70706c;
+}
+
+/* --- brush handles --- */
+
+#metric-modal .metric-chart .resize .handle {
+	fill: #555;
+}
+
+#metric-modal .metric-chart .resize .handle-mini {
+	fill: white;
+    stroke-width: 1px;
+    stroke: #555;
+}
+
+/*
+	--- ZOOM TO BUTTONS ---		[metric modal chart]
+*/
+
+#metric-modal .metric-chart .scale_button rect {
+	fill: #eaeaea;
+}
+
+#metric-modal .metric-chart .scale_button:hover text {
+	fill: white;
+	transition: all 0.1s cubic-bezier(.25,.8,.25,1);
+}
+
+#metric-modal .metric-chart .scale_button:hover rect {
+	fill: grey;	/* change for each theme */
+	transition: all 0.1s cubic-bezier(.25,.8,.25,1);
+}
+
+
+
+/*
+	--- EXPLANATORY TEXT (# views/downloads) ---		[metric modal chart]
+*/
+
+#metric-modal .metric-chart text#totalCount  {
+	font-size: 15px;
+	font-weight: bold;
+}
+
+#metric-modal .metric-chart text#displayDates  {
+	font-weight: bold;
+}
+
+/*
+	--- BARS ---		[metric modal chart]
+*/
+
+
+#metric-modal .metric-chart .bar,
+#metric-modal .metric-chart .bar_context {
+	fill: black;  /* change for each theme */
+	stroke-width: 0;
+	clip-path: url(#clip);
+}
+
+#metric-modal .metric-chart .bar {
+	stroke: black; /* change for each theme */
+	cursor: default;
+}
+
+/* --- context bars --- */
+
+
+/*
+	--- PANE CURSORS ---		[metric modal chart]
+*/
+
+#metric-modal .metric-chart rect.pane {
+	cursor: move; /* fallback if grab cursor is unsupported */
+	cursor: grab;
+	fill: #FAFAFA;
+	pointer-events: all;
+}
+
+#metric-modal .metric-chart rect.pane:active {
+	cursor: move; /* fallback if grab cursor is unsupported */
+	cursor: grabbing;
+}
+
+/*
+	--- TOOLTIPS ---		[metric modal chart]
+*/
+
+#metric-modal div.metric_tooltip {
+    position: fixed;
+    text-align: center;
+    height: 25px;
+    padding: 2px;
+    font: 10px sans-serif;
+    background: white;
+	color: #565656;
+    border: 0px;
+    border-radius: 2px;
+    pointer-events: none;
+	box-shadow: 0 0px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
+/*  ====== END: Metrics modal chart ======  */
+
+.metric-table.table.table-striped.table-condensed {
+    width: 930px;
+}
+.metric-table.table.table-striped.table-condensed td {
+    padding: 5px 15px 5px 85px;
+}
+.metric-table.table.table-striped.table-condensed td > .citation {
+    margin-left: -70px;
+}
+button.modal-btn.btn.btn-default {
+    all: unset;
+    cursor: pointer;
+}
+.metrics-route-to-metadata > span.author {
+    color: #888;
+    font-weight: normal;
+}
+
+.metrics-route-to-metadata > span.pubdate {
+    color: #888;
+    font-weight: normal;
+}
+
+.metrics-route-to-metadata > span.publisher {
+    color: #888;
+}
+
+/***********
+Non-clickable (Disabled) button styling for metrics views
+***********/
+a.btn.metrics-button-disabled {
+	width: 164px;
+	margin-bottom: 0px;
+    color: #555;
+    background-color: #F3F3F3;
+    cursor: default;
+    border: none;
+    box-shadow: none;
+
+}
+.metrics-button-disabled> .metric-value.badge {
     float: right;
-    color: #1C6E84;
-    background-color: #FFFFFF;
-}*/
-a.btn.metrics:hover, a.btn.metrics:click {
+    color: #FFF;
+    margin-left: 20px;
+    background-color: #555;
+    margin-top: 2px;
+}
+.metrics-button-disabled.metric-icon {
+    margin-right: 10px;
+    float: left;
+}
+.metrics-button-disabled.metric-name {
+    float: left;
+    margin-right: 10px;
+}
+.metrics-button-disabled.metric-value {
+    float: right;
+}
+.metrics-button-disabled:hover, .metrics-button-disabled:click {
     color: #888888;
-    background-color: #FFFFFF;
+    background-color: #F5F5F5;
     border-color: #C3C3C3;
 }
 
@@ -2169,6 +2470,191 @@ img[src*="googleapis.com/"].georegion-map{
   padding-left: 0;
   list-style: none;
 }
+/******************************************
+* Projects
+********************************************/
+.projectHeader {
+	border-spacing: 10px;
+	border-collapse: separate;
+}
+.projectHeader td{
+	vertical-align: middle;
+}
+.top-buffer {
+	margin-top:5px;
+	margin-bottom:8px;
+}
+.logo-container{
+	height: 100px;
+  white-space: nowrap;
+  width: 100%;
+  display: table;
+	padding-top:10px;
+}
+.logo-image{
+	vertical-align: middle;
+  padding: 10px;
+  display: table-cell;
+}
+.project-view .project-logo{
+	max-width: 100%;
+	max-height: 120px;
+}
+.project-view #results-container{
+	width: 100%;
+	margin-left:0px;
+}
+.project-view .mapMode #results-container,
+.project-view .mapMode #map-container{
+	width: 50%;
+}
+#project-search-results #clear-all{
+	display: none;
+}
+#project-description-container{
+	border-top: 1px solid #DDD;
+	margin-top: 20px;
+	padding-top: 10px;
+}
+#project-description-container img{
+	margin: 20px;
+	max-width: 80%;
+	width: auto;
+}
+.project-logos-view{
+	border-top: 1px solid #DDD;
+  padding-top: 40px;
+}
+.project-logos-view .img-logo{
+	max-width: 120px;
+}
+.well.awards-info {
+	background: inherit;
+	margin-top: 20px;
+}
+#project-toc-container{
+	position: sticky;
+	position: -webkit-sticky;
+	top: 20px;
+	margin-top: 58px;
+}
+.toc a{
+	color: #555;
+}
+.toc .icon{
+	color: #069;
+}
+i.toc-sub-item{
+	margin-left: 18px;
+	visibility: hidden;
+}
+.project-view .logo-row{
+	margin-bottom: 40px;
+}
+
+/*** Colors used in the Project View ***/
+.project-view .toc .icon{
+	color: var(--project-primary-color);
+}
+.project-view a:hover{
+	color: var(--project-secondary-color);
+}
+.project-view #project-section-tabs a{
+	color: var(--project-primary-color);
+}
+.project-view #project-section-tabs .active a{
+	color: #555;
+}
+.project-view .result-row .citation .title{
+	color: var(--project-primary-color);
+}
+.project-view .applied-filter{
+	background-color: var(--project-primary-color);
+}
+.project-view .filter-group-link a{
+	color: var(--project-primary-color);
+}
+.project-view .filter-group-link a:hover{
+	color: var(--project-secondary-color);
+}
+.project-view .filter-group-link.active a,
+.project-view .filter-group-link.active a:hover{
+	color: inherit;
+}
+.project-view .can-toggle input[type="checkbox"]:checked ~ label .can-toggle-switch,
+.project-view .can-toggle input[type="checkbox"]:checked:focus ~ label .can-toggle-switch{
+	background-color: var(--project-primary-color);
+}
+.project-view .can-toggle input[type="checkbox"]:checked:hover ~ label .can-toggle-switch{
+	background-color: var(--project-secondary-color);
+}
+.project-view .ui-slider-range{
+	background-color: var(--project-primary-color);
+}
+.project-view .result-row .citation a:hover,
+.project-view .result-row .citation a:hover .title,
+.project-view .result-row .citation a:hover .id{
+	color: var(--project-secondary-color);
+}
+.project-view .result-row .icon{
+	color: #666;
+}
+.project-view .profile .quick-stats circle{
+	stroke:  var(--project-primary-color);
+}
+.project-view svg .packages,
+.project-view .chart-title .packages{
+	color: var(--project-primary-color);
+	fill: var(--project-primary-color);
+}
+.project-view svg circle.packages{
+	fill: none;
+}
+.project-view svg .metadata,
+.project-view .fallback.metadata{
+	color: var(--project-secondary-color);
+	fill: var(--project-secondary-color);
+	stroke: var(--project-secondary-color);
+}
+.project-view .line-chart .line{
+	fill: none;
+}
+.project-view .line-chart text.line-chart-label{
+	fill: #FFF;
+}
+.project-view #project-members a{
+	color: var(--project-primary-color);
+}
+
+/* markdown citations */
+.markdown .inlineCitation {
+
+}
+
+.markdown .csl-entry {
+	text-indent: -15px;
+	margin-left: 15px;
+	margin-bottom: 10px;
+}
+
+.markdown #bibliography {
+	margin-top: 40px;
+	margin-bottom: 20px;
+}
+/******************************************
+* HTML converted from Markdown
+********************************************/
+
+/* the following two rules overwrite both:
+	i. the bootstrap `pre` rules
+	ii. individual theme `pre` rules
+*/
+div.markdown pre {
+	color: #383a42;
+	background: #fafafa;
+	border-radius: 3px;
+}
+
 /******************************************
 * Download / Resource Map contents table
 ********************************************/
@@ -2567,6 +3053,14 @@ address.email-container:before{
 #quality-score, #quality-chart{
 	display: none;
 }
+
+.quality-report-view #suiteId {
+    position: relative;
+    width: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 /******************************************
 ** Stats ***
 ******************************************/
@@ -2586,6 +3080,9 @@ address.email-container:before{
 }
 .profile .chart-title{
 	float: left;
+}
+.profile .charts{
+  box-sizing: border-box;
 }
 .profile .chart{
 	float: left;
@@ -2778,8 +3275,9 @@ svg .no-activity,
   border: 1px solid #ddd;
 }
 .list-group-header.list-group-item{
-	background-color: #ECF1F5;
+	background-color: #f5f5f5;
 	min-width: auto;
+	padding: 10px;
 }
 .panel>.list-group .list-group-item.active{
 	border-left-width: 5px;
@@ -2875,7 +3373,6 @@ body.mapMode{
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#b3000000',GradientType=0 ); /* IE6-9 */
   padding: 5px;
   top: 0px;
-  z-index: 1;
   height: auto;
   position: relative;
   display: block;
@@ -2900,7 +3397,7 @@ body.mapMode{
 	margin-right: 5px;
 }
 .map-toggle-container > label{
-	color: yellow;
+	color: #FFF;
 	float: right;
 }
 .map-toggle-container > input[type="checkbox"]{
@@ -3061,15 +3558,13 @@ body.mapMode{
 #sidebar .ui-helper-hidden-accessible{
 	display: none;
 }
-.filter-autocomplete .ui-menu-item a{
-	font-size: 1em;
-}
-.filter-autocomplete .ui-menu-item a:hover,
-.filter-autocomplete .ui-menu-item a:focus{
-	border: 0px;
-}
 #filter-year .filter-input-contain{
 	margin-top: 10px;
+}
+.filter-contain input[type="checkbox"].filter{
+   width: 20px;
+   float: left;
+   margin-right: 5px;
 }
 /*-- Pagination and sort --*/
 .sort-by{
@@ -3083,6 +3578,9 @@ body.mapMode{
 }
 .sort-by select{
 	width: auto;
+}
+#results-container .pagination{
+	box-sizing: border-box;
 }
 /*-- The filter checkboxes --*/
 #includes-files label{
@@ -3102,7 +3600,6 @@ body.mapMode{
 }
 .checkbox-list label{
  	font-size: .9em;
- 	clear: both;
 }
 .checkbox-list .more-link,
 .checkbox-list .less-link{
@@ -3115,34 +3612,6 @@ body.mapMode{
 	font-size: 1.2em;
 	vertical-align: text-bottom;
   	line-height: .9em;
-}
-/** UI Buttonsets **/
-.ui-buttonset label,
-.ui-buttonset label.ui-state-active{
-    float: none;
-}
-.ui-buttonset label#data-year-label,
-.ui-buttonset label#pub-year-label{
- 	margin: 0px 5px 5px 0px;
- 	float: left;
- 	width: auto;
-}
-.ui-checkboxradio-label input[type="checkbox"]{
-   	display: none;
-}
-.ui-checkboxradio-label .icon-check-empty,
-.ui-checkboxradio-label .icon-check{
-	margin-right: 5px;
-}
-.ui-checkboxradio-label .icon{
-	margin-right: 5px;
-}
-label.ui-state-active .icon-check-empty,
-label .icon-check {
-  display: none;
-}
-label.ui-state-active .icon-check{
-	display: inline;
 }
 /** Filter icons **/
 .filter-contain > label > .icon{
@@ -3201,6 +3670,360 @@ label.ui-state-active .icon-check{
 
 a.disabled {
 	pointer-events: none;
+}
+
+/********* Filter Views ***********/
+.filter-group .filter {
+  display: inline-block;
+  margin-right: 20px;
+}
+.filter-group .filter .btn{
+	box-shadow: none;
+	border-bottom-color: #ccc;
+}
+.filter-group .filter input{
+	box-shadow: none;
+}
+.filter-group-link a,
+.nav-tabs .filter-group-link a,
+.nav-tabs .filter-group-link.active a {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-bottom: 0px;
+    border-top: 0px;
+		border-radius: 0px;
+		border-top-width: 0px;
+		margin-right: 0px;
+		border-right-width: 0px;
+		text-align: center;
+}
+.nav-tabs .filter-group-link.active a{
+	background-color: #FFF;
+}
+.nav-tabs .filter-group-link a:hover{
+	border-color: #CCC;
+}
+.filter-group-link{
+	background-color: #eee;
+}
+.filter-group .filter .ui-slider{
+	position: relative;
+	height: 5px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	width: 90%;
+	width: calc(100% - 20px);
+}
+.filter-group .filter .ui-slider-handle{
+  width: 7px;
+  height: 16px;
+}
+.filters-title{
+	text-transform: uppercase;
+	color: #999;
+	font-size: .9em;
+	font-weight: normal;
+	visibility: hidden;
+	margin-top: 0px;
+}
+.filters-title .clear-all{
+	margin-left: 10px;
+}
+.filters-header .applied-filters{
+	min-height: 25px;
+}
+.filters-header > .filter{
+	float: left;
+	margin-right: 10px;
+}
+.filter.date .min,
+.filter.date .max{
+	max-width: 30%;
+}
+.filter.date .to{
+	width: 30%;
+	width: calc(40% - 50px);
+	text-align: center;
+	display: inline-block;
+}
+.filter.date .min{
+	float: left;
+	margin-right: 10px;
+}
+.filter.date .max{
+	float: right;
+	margin-left: 10px;
+}
+.filter .ui-slider{
+	min-height: 6px;
+  border-radius: 4px;
+  border: 0px;
+  background: #CCC;
+}
+.filter.boolean span{
+	display: inline;
+	margin-left: 5px;
+}
+.filter.numeric input{
+	max-width: 70px;
+}
+.filter.toggle .can-toggle > span{
+	margin-bottom: 5px;
+	display: block;
+}
+.filter-group .filter input[type='text']{
+	width: 80%;
+}
+.filter-group > .row-fluid:not(:first-child){
+	margin-top: 20px;
+}
+.applied-filter.label{
+	text-shadow: none;
+	font-size: 1em;
+	font-weight: normal;
+	padding: 5px;
+	margin-right: 10px;
+}
+.applied-filter .icon.remove-filter{
+	opacity: .7;
+	margin-left: 10px;
+	color: inherit;
+}
+.applied-filters{
+	margin: 0px;
+}
+.filters-header{
+	margin: 10px;
+}
+#project-filters{
+	border: 1px solid #CCC;
+	box-sizing: border-box;
+}
+#project-filters > .tab-content{
+	padding: 10px 20px;
+}
+#project-filters > .nav-tabs{
+	margin-bottom: 0px;
+	border: 1px solid #CCC;
+	border-left: 0px;
+	border-right: 0px;
+  background-color: #eee;
+}
+#project-filters > .nav-tabs > li:first-child > a{
+	border-left: 0px;
+}
+#project-filters > .nav-tabs > li:last-child > a{
+	border-right: 0px;
+}
+
+/******** Toggle Widget ************/
+.can-toggle {
+  position: relative;
+}
+.can-toggle *, .can-toggle *:before, .can-toggle *:after {
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
+			 font-size: 1em;
+}
+.can-toggle input[type="checkbox"] {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.can-toggle input[type="checkbox"][disabled] ~ label {
+  pointer-events: none;
+}
+.can-toggle input[type="checkbox"][disabled] ~ label .can-toggle-switch {
+  opacity: 0.4;
+}
+.can-toggle input[type="checkbox"]:checked ~ label .can-toggle-switch:before {
+  content: attr(data-unchecked);
+  left: 0;
+}
+.can-toggle input[type="checkbox"]:checked ~ label .can-toggle-switch:after {
+  content: attr(data-checked);
+}
+.can-toggle label {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  position: relative;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.can-toggle label .can-toggle__label-text {
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  padding-left: 32px;
+}
+.can-toggle label .can-toggle-switch {
+  position: relative;
+}
+.can-toggle label .can-toggle-switch:before {
+  content: attr(data-checked);
+  position: absolute;
+  top: 0;
+  text-align: center;
+}
+.can-toggle label .can-toggle-switch:after {
+  content: attr(data-unchecked);
+  position: absolute;
+  z-index: 5;
+  text-align: center;
+  background: white;
+  -webkit-transform: translate3d(0, 0, 0);
+          transform: translate3d(0, 0, 0);
+}
+.can-toggle input[type="checkbox"][disabled] ~ label {
+  color: rgba(119, 119, 119, 0.5);
+}
+.can-toggle input[type="checkbox"]:focus ~ label .can-toggle-switch,
+.can-toggle input[type="checkbox"]:hover ~ label .can-toggle-switch {
+  background-color: #777;
+}
+.can-toggle input[type="checkbox"]:focus ~ label .can-toggle-switch:after,
+.can-toggle input[type="checkbox"]:hover ~ label .can-toggle-switch:after {
+  color: #5e5e5e;
+}
+.can-toggle input[type="checkbox"]:hover ~ label {
+  color: #6a6a6a;
+}
+.can-toggle input[type="checkbox"]:checked ~ label:hover {
+  color: #55bc49;
+}
+.can-toggle input[type="checkbox"]:checked ~ label .can-toggle-switch {
+  background-color: #00689d;
+}
+.can-toggle input[type="checkbox"]:checked ~ label .can-toggle-switch:after {
+  color: #00689d;
+}
+.can-toggle input[type="checkbox"]:checked:focus ~ label .can-toggle-switch,
+.can-toggle input[type="checkbox"]:checked:hover ~ label .can-toggle-switch {
+  background-color: #00689d;
+}
+.can-toggle input[type="checkbox"]:checked:focus ~ label .can-toggle-switch:after,
+.can-toggle input[type="checkbox"]:checked:hover ~ label .can-toggle-switch:after {
+  color: #00689d;
+}
+.can-toggle label .can-toggle__label-text {
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+.can-toggle label .can-toggle-switch {
+  -webkit-transition: background-color 0.3s cubic-bezier(0, 1, 0.5, 1);
+          transition: background-color 0.3s cubic-bezier(0, 1, 0.5, 1);
+  background: #848484;
+}
+.can-toggle label .can-toggle-switch:before {
+  color: rgba(255, 255, 255, 0.5);
+}
+.can-toggle label .can-toggle-switch:after {
+  -webkit-transition: -webkit-transform 0.3s cubic-bezier(0, 1, 0.5, 1);
+  transition: transform 0.3s cubic-bezier(0, 1, 0.5, 1);
+  color: #777;
+}
+.can-toggle input[type="checkbox"]:focus ~ label .can-toggle-switch:after, .can-toggle input[type="checkbox"]:hover ~ label .can-toggle-switch:after {
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);
+}
+.can-toggle input[type="checkbox"]:checked ~ label .can-toggle-switch:after {
+  -webkit-transform: translate3d(65px, 0, 0);
+          transform: translate3d(65px, 0, 0);
+}
+.can-toggle input[type="checkbox"]:checked:focus ~ label .can-toggle-switch:after, .can-toggle input[type="checkbox"]:checked:hover ~ label .can-toggle-switch:after {
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);
+}
+.can-toggle label {
+  font-size: 1em;
+}
+.can-toggle label .can-toggle-switch {
+  height: 1.1em;
+  -webkit-flex: 0 0 134px;
+      -ms-flex: 0 0 134px;
+          flex: 0 0 134px;
+  border-radius: 4px;
+}
+.can-toggle label .can-toggle-switch:before {
+  left: 67px;
+  line-height: 1em;
+  width: 67px;
+  padding: 0 12px;
+}
+.can-toggle label .can-toggle-switch:after {
+  top: 2px;
+  left: 2px;
+  border-radius: 2px;
+  width: 65px;
+  line-height: 1.1em;
+}
+.can-toggle label .can-toggle-switch:hover:after {
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);
+}
+.can-toggle.can-toggle-small input[type="checkbox"]:focus ~ label .can-toggle-switch:after, .can-toggle.can-toggle-small input[type="checkbox"]:hover ~ label .can-toggle-switch:after {
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+}
+.can-toggle.can-toggle-small input[type="checkbox"]:checked ~ label .can-toggle-switch:after {
+  -webkit-transform: translate3d(44px, 0, 0);
+          transform: translate3d(44px, 0, 0);
+}
+.can-toggle.can-toggle-small input[type="checkbox"]:checked:focus ~ label .can-toggle-switch:after, .can-toggle.can-toggle-small input[type="checkbox"]:checked:hover ~ label .can-toggle-switch:after {
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+}
+.can-toggle.can-toggle-small label {
+  font-size: 1em;
+}
+.can-toggle.can-toggle-small label .can-toggle-switch {
+  height: 2em;
+  -webkit-flex: 0 0 90px;
+      -ms-flex: 0 0 90px;
+          flex: 0 0 90px;
+  border-radius: 2px;
+}
+.can-toggle.can-toggle-small label .can-toggle-switch:before {
+  left: 45px;
+  line-height: 2em;
+  width: 45px;
+  padding: 0 12px;
+}
+.can-toggle.can-toggle-small label .can-toggle-switch:after {
+  top: 1px;
+  left: 1px;
+  border-radius: 1px;
+  width: 44px;
+  line-height: calc(2em - 2px);;
+}
+.can-toggle.can-toggle-small label .can-toggle-switch:hover:after {
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+}
+/** Autocompletes **/
+.ui-autocomplete{
+  width: 246px;
+  background-color: #FFFFFF;
+  border: 1px solid #999999;
+  padding: 10px;
+  list-style: none;
+  overflow-y: scroll;
+  -webkit-transform: translate3d(0,0,0);
+  max-height: 150px;
+  z-index: 100;
+  overflow-x: hidden;
+}
+.ui-autocomplete .ui-menu-item{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 0px 5px;
+}
+.ui-autocomplete .ui-menu-item:hover{
+  background-color: #DDD;
+  cursor: pointer;
 }
 
 /*******************************************
@@ -3516,25 +4339,38 @@ ul.side-nav-items {
     width: 100px;
 }
 
-/* Editor package table column 2 */
-.data-package-item td:nth-of-type(2) {
+/* Editor package table file name column */
+.data-package-item td.name {
     white-space: normal;
 }
 
-/* Editor package table column 3 */
-.data-package-item td:nth-of-type(3) {
+/* Editor package table size column */
+.data-package-item td.size {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100px;
 }
 
-/* Editor package table column 4 */
-.data-package-item td:nth-of-type(4) {
+/* Editor package table type column */
+.data-package-item td.type {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100px;
+}
+
+/* Editor package table sharing column */
+.data-package-item td.sharing {
+    width: 60px;
+}
+
+.data-package-item td input[type='checkbox']{
+	margin-left: 30%;
+	height: auto;
+}
+.data-package-item .sharing .disabled{
+	opacity: .5;
 }
 
 /* Editor package table column 5 */

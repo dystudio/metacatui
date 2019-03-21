@@ -1089,9 +1089,6 @@ label.control-label{
     	-moz-border-top-right-radius: 0px;
 		-moz-border-bottom-right-radius: 0px;
     	margin-left: 10px;
-    	-moz-box-shadow: inset 0 0 10px -1px #CCC;
-		-webkit-box-shadow: inset 0 0 10px -1px #CCC;
-		box-shadow: inset 0 0 10px -1px #CCC;
 		color: #555;
     }
 
@@ -1473,10 +1470,6 @@ label.control-label{
     .info-icons .on-map > i{
     	font-size: 19px;
     }
-    .info-icons .icon{
-    	color: #6E3F57;
-    	cursor: pointer;
-    }
     .info-icons .icon:hover{
     	color: #CE0060;
     }
@@ -1493,6 +1486,10 @@ label.control-label{
 
     .result-row:hover .info-icons .inactive{
     	color: #B2CADD;
+    }
+
+    .info-icons .icon.icon-code-fork {
+      font-size: 1.3em;
     }
 
     .popover{
@@ -1724,6 +1721,7 @@ svg .packages,
 .profile .download-chart .bar-chart .bar.packages,
 .profile .download-chart .bar-chart text.packages{
 	fill: #32887F;
+  stroke: #32887F;
 }
   /* Donut charts */
   #metadata-chart,
@@ -2467,4 +2465,28 @@ img[src*="gstatic.com/"], img[src*="googleapis.com/"]  {
 
 #loading-app{
 	display: none;
+}
+
+/******************************************
+* Metric Modal Chart (Views, Downloads, Citations)
+********************************************/
+
+#metric-modal .metric-chart .scale_button:hover rect,
+#metric-modal .metric-chart .bar,
+#metric-modal .metric-chart .bar_context {
+	fill: #1C6E84;
+}
+
+#metric-modal .metric-chart .bar {
+	stroke: #1C6E84;
+}
+
+
+
+.metrics .metric-value.badge{
+  background-color: #1C6E84;
+}
+.metrics:hover .metric-value.badge{
+  background-color: #FFFFFF;
+  color: #1C6E84;
 }

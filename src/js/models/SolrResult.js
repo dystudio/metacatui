@@ -193,7 +193,8 @@ define(['jquery', 'underscore', 'backbone'],
 		 */
 		isDOI: function(customString) {
 			var DOI_PREFIXES = ["doi:10.", "http://dx.doi.org/10.", "http://doi.org/10.", "http://doi.org/doi:10.",
-				"https://dx.doi.org/10.", "https://doi.org/10.", "https://doi.org/doi:10."];
+				"https://dx.doi.org/10.", "https://doi.org/10.", "https://doi.org/doi:10."],
+				  DOI_REGEX = new RegExp(/^10.\d{4,9}\/[-._;()/:A-Z0-9]+$/i);;
 
 			//If a custom string is given, then check that instead of the seriesId and id from the model
 			if( typeof customString == "string" ){
@@ -201,16 +202,29 @@ define(['jquery', 'underscore', 'backbone'],
 					if (customString.toLowerCase().indexOf(DOI_PREFIXES[i].toLowerCase()) == 0 )
 						return true;
 				}
+
+				//If there is no DOI prefix, check for a DOI without the prefix using a regular expression
+				if( DOI_REGEX.test(customString) ){
+					return true;
+				}
+
 			}
+			else{
+				var seriesId = this.get("seriesId"),
+						pid      = this.get("id");
 
-			var seriesId = this.get("seriesId"),
-			    pid      = this.get("id");
+				for (var i=0; i < DOI_PREFIXES.length; i++) {
+					if (seriesId && seriesId.toLowerCase().indexOf(DOI_PREFIXES[i].toLowerCase()) == 0 )
+						return true;
+					else if (pid && pid.toLowerCase().indexOf(DOI_PREFIXES[i].toLowerCase()) == 0 )
+						return true;
+				}
 
-			for (var i=0; i < DOI_PREFIXES.length; i++) {
-				if (seriesId && seriesId.toLowerCase().indexOf(DOI_PREFIXES[i].toLowerCase()) == 0 )
+				//If there is no DOI prefix, check for a DOI without the prefix using a regular expression
+				if( DOI_REGEX.test(seriesId) || DOI_REGEX.test(pid) ){
 					return true;
-				else if (pid && pid.toLowerCase().indexOf(DOI_PREFIXES[i].toLowerCase()) == 0 )
-					return true;
+				}
+
 			}
 
 			return false;
@@ -326,7 +340,7 @@ define(['jquery', 'underscore', 'backbone'],
 			var model = this;
 
 			if(!fields)
-				var fields = "abstract,id,seriesId,fileName,resourceMap,formatType,formatId,obsoletedBy,isDocumentedBy,documents,title,origin,keywords,attributeName,pubDate,eastBoundCoord,westBoundCoord,northBoundCoord,southBoundCoord,beginDate,endDate,dateUploaded,datasource,replicaMN,isAuthorized,isPublic,size,read_count_i,isService,serviceTitle,serviceEndpoint,serviceOutput,serviceDescription,serviceType";
+				var fields = "abstract,id,seriesId,fileName,resourceMap,formatType,formatId,obsoletedBy,isDocumentedBy,documents,title,origin,keywords,attributeName,pubDate,eastBoundCoord,westBoundCoord,northBoundCoord,southBoundCoord,beginDate,endDate,dateUploaded,archived,datasource,replicaMN,isAuthorized,isPublic,size,read_count_i,isService,serviceTitle,serviceEndpoint,serviceOutput,serviceDescription,serviceType";
 
 			var escapeSpecialChar = MetacatUI.appSearchModel.escapeSpecialChar;
 
@@ -342,8 +356,12 @@ define(['jquery', 'underscore', 'backbone'],
 			else if(this.get("seriesId") && !this.get("id"))
 				query += 'seriesId:"' + escapeSpecialChar(encodeURIComponent(this.get("id"))) + '" -obsoletedBy:*';
 
+			query += "&fl=" + fields + //Specify the fields to return
+			         "&wt=json&rows=1000" + //Get the results in JSON format and get 1000 rows
+			         "&archived=archived:*"; //Get archived or unarchived content
+
 			var requestSettings = {
-				url: MetacatUI.appModel.get("queryServiceUrl") + query + '&fl='+fields+'&wt=json',
+				url: MetacatUI.appModel.get("queryServiceUrl") + query,
 				type: "GET",
 				success: function(data, response, xhr){
 					var docs = data.response.docs;
@@ -354,16 +372,64 @@ define(['jquery', 'underscore', 'backbone'],
 					}
 					//If we searched by seriesId, then let's find the most recent version in the series
 					else if(docs.length > 1){
+						//Filter out docs that are obsoleted
 						var mostRecent = _.reject(docs, function(doc){
 							return (typeof doc.obsoletedBy !== "undefined");
 						});
 
-						if(mostRecent.length > 0)
+						//If there is only one doc that is not obsoleted (the most recent), then
+						// set this doc's values on this model
+						if(mostRecent.length == 1){
 							model.set(mostRecent[0]);
-						else
-							model.set(docs[0]); //Just default to the first doc found
+							model.trigger("sync");
+						}
+						else{
+							//If there are multiple docs without an obsoletedBy statement, then
+							// retreive the head of the series via the system metadata
+							var sysMetaRequestSettings = {
+								url: MetacatUI.appModel.get("metaServiceUrl") + encodeURIComponent(docs[0].seriesId),
+								type: "GET",
+								success: function(sysMetaData){
+									//Get the identifier node from the system metadata
+									var seriesHeadID = $(sysMetaData).find("identifier").text();
+									//Get the doc from the Solr results with that identifier
+									var seriesHead = _.findWhere(docs, { id: seriesHeadID });
 
-						model.trigger("sync");
+									//If there is a doc in the Solr results list that matches the series head id
+									if(seriesHead){
+										//Set those values on this model
+										model.set(seriesHead);
+									}
+									//Otherwise, just fall back on the first doc in the list
+									else if( mostRecent.length ){
+										model.set(mostRecent[0]);
+									}
+									else {
+										model.set(docs[0]);
+									}
+
+									model.trigger("sync");
+
+								},
+								error: function(xhr, textStatus, errorThrown){
+
+									// Fall back on the first doc in the list
+									if( mostRecent.length ){
+										model.set(mostRecent[0]);
+									}
+									else {
+										model.set(docs[0]);
+									}
+
+									model.trigger("sync");
+
+								}
+							};
+
+							$.ajax(_.extend(sysMetaRequestSettings, MetacatUI.appUserModel.createAjaxSettings()));
+
+						}
+
 					}
 					else{
 						model.set("indexed", false);
@@ -429,17 +495,27 @@ define(['jquery', 'underscore', 'backbone'],
 					//Trigger the sync event so the app knows we found the model info
 					model.trigger("sync");
 				},
-				error: function(){
-					model.notFound();
+				error: function(response){
+
+          //When the user is unauthorized to access this object, trigger a 401 error
+          if( response.status == 401 ){
+            model.set("notFound", true);
+            model.trigger("401");
+          }
+          //When the object doesn't exist, trigger a 404 error
+          else if( response.status == 404 ){
+            model.set("notFound", true);
+      			model.trigger("404");
+          }
+          //Other error codes trigger a generic error
+          else{
+            model.trigger("error");
+          }
+
 				}
 			}
 
 			$.ajax(_.extend(requestSettings, MetacatUI.appUserModel.createAjaxSettings()));
-		},
-
-		notFound: function(){
-			this.set({"notFound": true}, {silent: true});
-			this.trigger("404");
 		},
 
 		//Transgresses the obsolence chain until it finds the newest version that this user is authorized to read
@@ -586,6 +662,50 @@ define(['jquery', 'underscore', 'backbone'],
 		getOutputs: function(){
 			return this.get("prov_generated");
 		},
+
+    /*
+    * Uses the app configuration to check if this model's metrics should be hidden in the display
+    *
+    * @return {boolean}
+    */
+    hideMetrics: function(){
+
+      //If the AppModel is configured with cases of where to hide metrics,
+      if( typeof MetacatUI.appModel.get("hideMetricsWhen") == "object" && MetacatUI.appModel.get("hideMetricsWhen") ){
+
+        //Check for at least one match
+        return _.some( MetacatUI.appModel.get("hideMetricsWhen"), function(value, modelProperty){
+
+          //Get the value of this property from this model
+          var modelValue = this.get(modelProperty);
+
+          //Check for the presence of this model's value in the AppModel value
+          if( Array.isArray(value) && typeof modelValue == "string" ){
+            return _.contains(value, modelValue)
+          }
+          //Check for the presence of the AppModel's value in this model's value
+          else if( typeof value == "string" && Array.isArray(modelValue) ){
+            return _.contains(modelValue, value);
+          }
+          //Check for overlap of two arrays
+          else if( Array.isArray(value) && Array.isArray(modelValue) ){
+            return ( _.intersection(value, modelValue).length > 0 );
+          }
+          //If the AppModel value is a function, execute it
+          else if( typeof value == "function" ){
+            return value(modelValue);
+          }
+          //Otherwise, just check for equality
+          else{
+            return value === modelValue;
+          }
+
+        }, this);
+      }
+      else {
+        return false;
+      }
+    },
 
 		/****************************/
 

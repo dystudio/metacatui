@@ -30,7 +30,9 @@ define(['jquery', 'underscore', 'backbone', 'uuid', 'md5', 'rdflib', 'models/Sol
 				sourceDocs: [],
 				derivationDocs: [],
 				relatedModels: [], //A condensed list of all SolrResult models related to this package in some way
-				parentPackageMetadata: null
+				parentPackageMetadata: null,
+				//If true, when the member objects are retrieved, archived content will be included
+				getArchivedMembers: false,
 			}
 		},
 
@@ -75,7 +77,6 @@ define(['jquery', 'underscore', 'backbone', 'uuid', 'md5', 'rdflib', 'models/Sol
         dataPackageGraph: null,
 
 		initialize: function(options){
-			this.on("complete", this.getLogInfo);
 			this.setURL();
 
 			// Create an initial RDF graph
@@ -159,6 +160,10 @@ define(['jquery', 'underscore', 'backbone', 'uuid', 'md5', 'rdflib', 'models/Sol
 						'&rows=1000' +
 						'&q=%28resourceMap:%22' + encodeURIComponent(this.id) + '%22%20OR%20id:%22' + encodeURIComponent(this.id) + '%22%29' +
 						'&wt=json';
+
+			if( this.get("getArchivedMembers") ){
+				query += "&archived=archived:*";
+			}
 
 			var requestSettings = {
 				url: MetacatUI.appModel.get("queryServiceUrl") + query,
@@ -726,7 +731,8 @@ define(['jquery', 'underscore', 'backbone', 'uuid', 'md5', 'rdflib', 'models/Sol
 				url: MetacatUI.appModel.get("queryServiceUrl") + query,
 				success: function(data, textStatus, xhr) {
 					var results = data.grouped.formatType.groups,
-						rMapList = _.where(results, { groupValue: "RESOURCE" })[0].doclist,
+							resourceMapGroup = _.where(results, { groupValue: "RESOURCE" })[0],
+						rMapList = resourceMapGroup? resourceMapGroup.doclist : null,
 						rMaps = rMapList? rMapList.docs : [],
 						rMapIds = _.pluck(rMaps, "id"),
 						parents = [],
@@ -762,7 +768,7 @@ define(['jquery', 'underscore', 'backbone', 'uuid', 'md5', 'rdflib', 'models/Sol
 			var url = null;
 
 			//If we haven't set a packageServiceURL upon app initialization and we are querying a CN, then the packageServiceURL is dependent on the MN this package is from
-			if(!MetacatUI.appModel.get("packageServiceUrl") && (MetacatUI.appModel.get("d1Service").toLowerCase().indexOf("cn/") > -1) && MetacatUI.nodeModel.get("members").length){
+			if((MetacatUI.appModel.get("d1Service").toLowerCase().indexOf("cn/") > -1) && MetacatUI.nodeModel.get("members").length){
 				var source = this.get("datasource"),
 					node   = _.find(MetacatUI.nodeModel.get("members"), {identifier: source});
 
@@ -840,48 +846,6 @@ define(['jquery', 'underscore', 'backbone', 'uuid', 'md5', 'rdflib', 'models/Sol
 
 						}
 					}
-			}
-			$.ajax(_.extend(requestSettings, MetacatUI.appUserModel.createAjaxSettings()));
-		},
-
-		getLogInfo: function(){
-			if(!MetacatUI.appModel.get("d1LogServiceUrl") || (typeof MetacatUI.appModel.get("d1LogServiceUrl") == "undefined")) return;
-
-			var model = this;
-
-			var memberIds = _.map(this.get("members"), function(m){
-				return  m.get("id");
-			});
-			//Get the read events
-			var logsSearch = new LogsSearch();
-			logsSearch.set({
-				pid: memberIds,
-				event: "read",
-				facets: "pid"
-			});
-
-			var url = MetacatUI.appModel.get("d1LogServiceUrl") + "q=" + logsSearch.getQuery() + logsSearch.getFacetQuery();
-			var requestSettings = {
-				url: url + "&wt=json&rows=0",
-				success: function(data, textStatus, xhr){
-					var pidCounts = data.facet_counts.facet_fields.pid;
-
-					if(!pidCounts || !pidCounts.length){
-						_.invoke(model.get("members"), "set", {reads: 0});
-						_.invoke(model.get("members"), "trigger", "change:reads");
-						return;
-					}
-
-					for(var i=0; i < pidCounts.length; i+=2){
-						var doc = _.findWhere(model.get("members"), { id: pidCounts[i] });
-						if(!doc) break;
-
-						doc.set("reads", pidCounts[i+1]);
-					}
-
-					//Trigger the change all event to send notice that all members have changed somehow
-					model.trigger("changeAll");
-				}
 			}
 			$.ajax(_.extend(requestSettings, MetacatUI.appUserModel.createAjaxSettings()));
 		},

@@ -3,7 +3,7 @@ define(['jquery', 'underscore', 'backbone'],
     function($, _, Backbone) {
     'use strict';
 
-    // Metric Model 
+    // Metric Model
     // -------------
     var Metrics = Backbone.Model.extend({
         defaults: {
@@ -11,8 +11,10 @@ define(['jquery', 'underscore', 'backbone'],
             startDate: null,
             endDate: null,
             results: null,
-            pid: '',
+            resultDetails: null,
+            pid_list: null,
             url: null,
+            filterType: null,
 
             // metrics and metric Facets returned as response from the user
             // datatype: array
@@ -24,6 +26,7 @@ define(['jquery', 'underscore', 'backbone'],
             years: null,
             repository: null,
             award: null,
+            datasets: null,
 
 
             // Total counts for metrics
@@ -34,10 +37,10 @@ define(['jquery', 'underscore', 'backbone'],
 
             metricsRequiredFields: {
                 metricName: true,
-                pid: true
+                pid_list: true
             }
         },
-        
+
 
         metricRequest: {
             "metricsPage": {
@@ -46,15 +49,13 @@ define(['jquery', 'underscore', 'backbone'],
                 "count": 0
             },
             "metrics": [
-                "Citations",
-                "Unique_Dataset_Requests",
-                "Total_Dataset_Requests",
-                "Total_Dataset_Investigations",
-                "Unique_Dataset_Investigations"
+                "citations",
+                "downloads",
+                "views"
             ],
             "filterBy": [
                 {
-                    "filterType": "dataset",
+                    "filterType": "",
                     "values": [],
                     "interpretAs": "list"
                 },
@@ -65,26 +66,26 @@ define(['jquery', 'underscore', 'backbone'],
                 }
             ],
             "groupBy": [
-                "month", "country"
+                "month"
             ]
         },
 
-        // Initializing the Model objects pid and gthe metricName variables.
+        // Initializing the Model objects pid and the metricName variables.
         initialize: function(options) {
             if(!(options.pid == 'undefined')) {
-                this.pid = options.pid;
+                this.pid_list = options.pid_list;
+                this.filterType = options.type;
             }
             // url for the model that is used to for the fetch() call
-            this.url = MetacatUI.appModel.get("metricsUrl")
+            this.url = MetacatUI.appModel.get("metricsUrl");
         },
 
         // Overriding the Model's fetch function.
         fetch: function(){
           var fetchOptions = {};
+          this.metricRequest.filterBy[0].filterType = this.filterType;
+          this.metricRequest.filterBy[0].values = this.pid_list;
 
-          this.metricRequest.filterBy[0].values = [];
-          this.metricRequest.filterBy[0].values.push(this.pid);
-          
           // TODO: Set the startDate and endDate based on the datePublished and current date
           // respctively.
           this.metricRequest.filterBy[1].values = [];
@@ -92,15 +93,14 @@ define(['jquery', 'underscore', 'backbone'],
           this.metricRequest.filterBy[1].values.push(this.getCurrentDate());
 
           // HTTP GET
-          fetchOptions = _.extend({data:"metricsRequest="+JSON.stringify(this.metricRequest)});
-          
+          fetchOptions = _.extend({data:"metricsRequest="+JSON.stringify(this.metricRequest), timeout:50000});
           // Uncomment to set it as a HTTP POST
           // fetchOptions = _.extend({data:JSON.stringify(this.metricRequest), type="POST"});
 
           //This calls the Backbone fetch() function but with our custom fetch options.
           return Backbone.Model.prototype.fetch.call(this, fetchOptions);
         },
-        
+
         getCurrentDate: function() {
             var today = new Date();
             var dd = today.getDate();
@@ -109,23 +109,26 @@ define(['jquery', 'underscore', 'backbone'],
             var yyyy = today.getFullYear();
             if(dd<10){
                 dd='0'+dd;
-            } 
+            }
             if(mm<10){
                 mm='0'+mm;
-            } 
+            }
             var today = mm+'/'+dd+'/'+yyyy;
             return today;
         },
 
         // Parsing the response for setting the Model's member variables.
         parse: function(response){
+
             return {
                 "metricRequest": response.metricsRequest,
                 "citations": response.results.citations,
                 "views": response.results.views,
                 "downloads": response.results.downloads,
-                "months": response.results.month,
-                "country": response.results.country
+                "months": response.results.months,
+                "country": response.results.country,
+                "resultDetails": response.resultDetails,
+                "datasets": response.results.datasets
             }
         }
 

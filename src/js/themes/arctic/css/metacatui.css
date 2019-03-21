@@ -1539,10 +1539,6 @@ MDQ items
     }
 
     /* Filter checkboxes */
-    input.filter[type="checkbox"]{
-    	display: none;
-    }
-
    .filter-contain .checkbox-list{
     	margin-left: 0px;
     }
@@ -1773,41 +1769,6 @@ MDQ items
    		float: left;
    }
 
-         /* Autocomplete */
-    ul.ui-autocomplete{
-    	width: 246px;
-    	background-color: #FFFFFF;
-    	border: 1px solid #999999;
-    	padding: 10px;
-    	list-style: none;
-    	overflow-y: scroll;
-    	-webkit-transform: translate3d(0,0,0);
-    	max-height: 150px;
-    	z-index: 100;
-    }
-
-    li.ui-menu-item{
-    	width: 100%;
-    	overflow: hidden;
-    	white-space: nowrap;
-    	text-overflow: ellipsis;
-    	background-color:#FFFFFF;
-    }
-
-    li.ui-menu-item > a{
-    	color: #555555;
-    	width: 100%;
-    }
-
-    li.ui-menu-item > a:hover,
-    .ui-state-focus
-     {
-        color: #1f254f;
-    	cursor: pointer;
-    	text-decoration: none;
-    	font-weight: bold;
-	}
-
 
 /* RESULTS CSS
 -------------------------------------------------- */
@@ -1929,10 +1890,6 @@ MDQ items
 
     .result-row a.download > .icon-caret-down {
     	margin-left: 3px;
-    }
-    .result-row .info-icons .download{
-    	cursor: pointer;
-    	color: #1f254f;
     }
 
     /*-- Pagination widget --*/
@@ -2932,9 +2889,6 @@ iframe classes
 /******************************************
 * Metrics Controller Styling
 ********************************************/
-a.btn.metrics {
-    margin-top: -20px;
-}
 .edit-toolbar >
 #metadata-controls-container >
 .metadata-controls-container >
@@ -2958,4 +2912,27 @@ a {
     margin-top: -38px;
     margin-right: -25px;
     margin-left: 355px;
+}
+
+.metrics .metric-value.badge{
+  background-color: #146660;
+}
+.metrics:hover .metric-value.badge{
+  background-color: #FFFFFF;
+  color: #146660;
+}
+
+/******************************************
+* Metric Modal Chart (Views, Downloads, Citations)
+********************************************/
+
+
+#metric-modal .metric-chart .scale_button:hover rect,
+#metric-modal .metric-chart .bar,
+#metric-modal .metric-chart .bar_context {
+   fill: #146660;
+}
+
+#metric-modal .metric-chart .bar {
+   stroke: #146660;
 }

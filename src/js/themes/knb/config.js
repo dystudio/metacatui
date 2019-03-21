@@ -30,6 +30,8 @@ MetacatUI.customAppConfig = function(){
 
     //Gmaps key  AIzaSyA6-jiEs5rmEqKk70bigvnwuvhdZbt4tJs
 
-    MetacatUI.appModel.set("nodeId", "urn:node:KNB");
-    MetacatUI.appModel.set("googleAnalyticsKey", "UA-1588494-14")
+	//Gmaps key  AIzaSyA6-jiEs5rmEqKk70bigvnwuvhdZbt4tJs
+
+	MetacatUI.appModel.set("nodeId", "urn:node:KNB");
+	MetacatUI.appModel.set("googleAnalyticsKey", "UA-1588494-14");
 }

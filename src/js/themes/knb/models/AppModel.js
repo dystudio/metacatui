@@ -32,8 +32,10 @@ define(['jquery', 'underscore', 'backbone'],
 
 			maxDownloadSize: 3000000000,
 
-			// set this variable to true, if the content being published is moderated by the data team.
-			contentIsModerated: false,
+      // Flag which, when true shows Whole Tale features in the UI
+      showWholeTaleFeatures: false,
+      taleEnvironments: ["RStudio", "Jupyter Notebook"],
+      dashboardUrl: 'https://girder.wholetale.org/api/v1/integration/dataone',
 
 			/*
 			 * emlEditorRequiredFields is a hash map of all the required fields in the EML Editor.
@@ -57,6 +59,10 @@ define(['jquery', 'underscore', 'backbone'],
 
 			editableFormats: ["eml://ecoinformatics.org/eml-2.1.1"],
 
+      //These error messages are displayed when the Editor encounters an error saving
+      editorSaveErrorMsg: "Not all of your changes could be submitted.",
+      editorSaveErrorMsgWithDraft: "Not all of your changes could be submitted. ",
+
 			defaultAccessPolicy: [{
 
 				subject: "CN=knb-data-admins,DC=dataone,DC=org",
@@ -68,6 +74,8 @@ define(['jquery', 'underscore', 'backbone'],
 				subject: "public",
 				read: true
 			}],
+
+			allowAccessPolicyChanges: true,
 
 			baseUrl: window.location.origin || (window.location.protocol + "//" + window.location.host),
 			// the most likely item to change is the Metacat deployment context
@@ -81,7 +89,16 @@ define(['jquery', 'underscore', 'backbone'],
 			packageServiceUrl: null,
 			publishServiceUrl: null,
 			authServiceUrl: null,
+
 			queryServiceUrl: null,
+
+      //If set to false, some parts of the app will send POST HTTP requests to the
+      // Solr search index via the `/query/solr` DataONE API.
+      // Set this configuration to true if using Metacat 2.10.2 or earlier
+      disableQueryPOSTs: false,
+
+      defaultSearchFilters: ["all", "attribute", "documents", "creator", "dataYear", "pubYear", "id", "taxon", "spatial"],
+
 			metaServiceUrl: null,
 			//ldapwebServiceUrl: null,
 			metacatBaseUrl: null,
@@ -104,11 +121,15 @@ define(['jquery', 'underscore', 'backbone'],
 			accountsMapsUrl: null,
 			groupsUrl: null,
 			portalUrl: null,
-			mdqUrl: "https://quality.nceas.ucsb.edu/quality/",
+
+            mdqBaseUrl: "https://docker-ucsb-1.dataone.org:30443/quality",
+            // suidIds and suiteLables must be specified as a list, even if only one suite is available.
+            suiteIds: ["knb.suite.1"],
+            suiteLabels: ["KNB Metadata Completeness Suite v1.0"],
 
 			// Metrics endpoint url
-			metricsUrl: null,
-			
+			metricsUrl: 'https://logproc-stage-ucsb-1.test.dataone.org/metrics',
+
 			// Metrics flags for the Dataset Landing Page
 			// Enable these flags to enable metrics display
 			displayDatasetMetrics: true,
@@ -122,10 +143,34 @@ define(['jquery', 'underscore', 'backbone'],
 			displayDatasetEditButton: true,
 			displayDatasetQualityMetric: false,
 			displayDatasetAnalyzeButton: false,
-			displayMetricModals: false,
+			displayMetricModals: true,
 			displayDatasetControls: true,
+      /* Hide metrics display for SolrResult models that match the given properties.
+      *  Properties can be functions, which are given the SolrResult model value as a parameter.
+      * Example:
+      * {
+      *    formatId: "eml://ecoinformatics.org/eml-2.1.1",
+      *    isPublic: true,
+      *    dateUploaded: function(date){
+      *      return new Date(date) < new Date('1995-12-17T03:24:00');
+      *    }
+      * }
+      * This example would hide metrics for any objects that are:
+      *   EML 2.1.1 OR public OR were uploaded before 12/17/1995.
+      */
+      hideMetricsWhen: null,
 
-			isJSONLDEnabled: true
+			isJSONLDEnabled: true,
+      // A lookup map of project names to project seriesIds
+      projectsMap: {
+      	"SASAP": "urn:uuid:db68e045-fe37-4190-aa2f-d79fd854df6d",
+				"markdownTest": "urn:uuid:21580913-c23a-4677-af71-45cf0415a57e",
+				"example": "urn:uuid:db68e045-fe37-4190-aa2f-d79fd854d1234"
+      },
+
+			// If true, then archived content is available in the search index.
+			// Set to false if this MetacatUI is using a Metacat version before 2.10.0
+			archivedContentIsIndexed: true
 		},
 
 		defaultView: "data",
@@ -150,6 +195,12 @@ define(['jquery', 'underscore', 'backbone'],
 			this.set('metacatServiceUrl', this.get('baseUrl') + this.get('context') + '/metacat');
 			//The package service
 			this.set('packageServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/packages/application%2Fbagit-097/');
+
+            // Metadata quality report services
+            this.set('mdqSuitesServiceUrl', this.get("mdqBaseUrl") + "/suites/");
+            this.set('mdqRunsServiceUrl', this.get('mdqBaseUrl') + "/runs/");
+            this.set('mdqSuiteIds', this.get("suiteIds"));
+            this.set('mdqSuiteLabels', this.get("suiteLabels"));
 
 			if(typeof this.get("grantsUrl") !== "undefined")
 				this.set("grantsUrl", "https://api.nsf.gov/services/v1/awards.json");
@@ -204,9 +255,6 @@ define(['jquery', 'underscore', 'backbone'],
 				if(typeof this.get("d1LogServiceUrl") != "undefined")
 					this.set('d1LogServiceUrl', this.get('d1CNBaseUrl') + this.get('d1CNService') + '/query/logsolr/?');
 
-
-
-				this.set("metricsUrl", 'https://logproc-stage-ucsb-1.test.dataone.org/metrics/filters');
 			}
 
 			this.on("change:pid", this.changePid);

@@ -57,9 +57,12 @@ To run MetacatUI, you will need to first install a web server such as [Apache](h
       ServerName metacatui.localhost
       ErrorLog "/private/var/log/apache2/metacatui-error_log"
       CustomLog "/private/var/log/apache2/metacatui-access_log" common
-
+      
+      # Allow encoded slashes in URLs so encoded identifiers can be sent in MetacatUI URLs
+      AllowEncodedSlashes On
+      
      <Directory "/Users/walker/Sites/metacatui">
-      FallbackResource /index.html
+      FallbackResource /metacatui/index.html
     </Directory>
   </VirtualHost>
   ```

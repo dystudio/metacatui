@@ -15,7 +15,6 @@ define(['jquery', 'underscore', 'backbone', 'views/SignInView', 'text!templates/
 						  'click #search_btn' : 'triggerSearch',
 					   'keypress #search_txt' : 'triggerOnEnter',
 			         'click .show-new-search' : 'resetSearch',
-			         'click .show-new-editor' : 'resetEditor',
 			 		 'click .dropdown-menu a' : 'hideDropdown',
 			 		 	    'click .dropdown' : 'hideDropdown',
 			 		 	'mouseover .dropdown' : 'showDropdown',
@@ -82,7 +81,7 @@ define(['jquery', 'underscore', 'backbone', 'views/SignInView', 'text!templates/
 			$("#search_txt").val('');
 
 			//Clear the search model to start a fresh search
-			appSearchModel.clear().set(MetacatUI.appSearchModel.defaults);
+			MetacatUI.appSearchModel.clear().set(MetacatUI.appSearchModel.defaults);
 
 			//Create a new array with the new search term
 			var newSearch = [searchTerm];
