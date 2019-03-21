@@ -19,6 +19,7 @@ require.config({
         "uuid": "../src/components/uuid",
         "md5": "../src/components/md5",
         "x2js": "../src/components/xml2json",
+        "he": "../src/components/he",
         // The paths to the app components
         "models": "../src/js/models",
         "collections": "../src/js/collections",
