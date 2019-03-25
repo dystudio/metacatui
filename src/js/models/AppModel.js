@@ -66,13 +66,13 @@ define(['jquery', 'underscore', 'backbone'],
 
 			defaultAccessPolicy: [],
 
-			baseUrl: "https://dev.nceas.ucsb.edu",//window.location.origin || (window.location.protocol + "//" + window.location.host),
+			mnBaseURL: window.location.origin || (window.location.protocol + "//" + window.location.host),
 			allowAccessPolicyChanges: true,
 			// the most likely item to change is the Metacat deployment context
 			context: '/metacat',
 			d1Service: '/d1/mn/v2',
-			d1CNBaseUrl: "https://cn-stage-2.test.dataone.org/",
-			d1CNService: "cn/v2",
+			cnBaseURL: "https://cn.dataone.org",
+			d1CNService: "/cn/v2",
 			d1LogServiceUrl: null,
 			nodeServiceUrl: null,
 			viewServiceUrl: null,
@@ -90,7 +90,6 @@ define(['jquery', 'underscore', 'backbone'],
       defaultSearchFilters: ["all", "attribute", "documents", "creator", "dataYear", "pubYear", "id", "taxon", "spatial"],
 
       metaServiceUrl: null,
-			metacatBaseUrl: null,
 			metacatServiceUrl: null,
 			objectServiceUrl: null,
       formatsServiceUrl: null,
@@ -160,34 +159,24 @@ define(['jquery', 'underscore', 'backbone'],
 
 		initialize: function() {
 
-			//Set all the MetacatUI settings from the app configuration file
-			this.set(MetacatUI.config);
-
-			//If no base URL is specified, then user the DataONE CN base URL
-			if(!this.get("baseUrl")){
-				this.set("baseUrl",   this.get("d1CNBaseUrl"));
-				this.set("d1Service", this.get("d1CNService"));
-			}
-
 			// these are pretty standard, but can be customized if needed
-			this.set('metacatBaseUrl', this.get('baseUrl') + this.get('context'));
-			this.set('viewServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/views/metacatui/');
-			this.set('publishServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/publish/');
-			this.set('authServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/isAuthorized/');
-			this.set('queryServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/query/solr/?');
-			this.set('metaServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/meta/');
-			this.set('objectServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/object/');
-			this.set('metacatServiceUrl', this.get('baseUrl') + this.get('context') + '/metacat');
+			this.set('viewServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/views/metacatui/');
+			this.set('publishServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/publish/');
+			this.set('authServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/isAuthorized/');
+			this.set('queryServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/query/solr/?');
+			this.set('metaServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/meta/');
+			this.set('objectServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/object/');
+			this.set('metacatServiceUrl', this.get('mnBaseURL') + '/metacat');
 
 			if(typeof this.get("grantsUrl") !== "undefined")
 				this.set("grantsUrl", "https://api.nsf.gov/services/v1/awards.json");
 
 			//DataONE CN API
-			if(this.get("d1CNBaseUrl")){
+			if(this.get("cnBaseURL")){
 
 				//Account services
 				if(typeof this.get("accountsUrl") != "undefined"){
-					this.set("accountsUrl", this.get("d1CNBaseUrl") + this.get("d1CNService") + "/accounts/");
+					this.set("accountsUrl", this.get("cnBaseURL") + this.get("d1CNService") + "/accounts/");
 
 					if(typeof this.get("pendingMapsUrl") != "undefined")
 						this.set("pendingMapsUrl", this.get("accountsUrl") + "pendingmap/");
@@ -196,41 +185,41 @@ define(['jquery', 'underscore', 'backbone'],
 						this.set("accountsMapsUrl", this.get("accountsUrl") + "map/");
 
 					if(typeof this.get("groupsUrl") != "undefined")
-						this.set("groupsUrl", this.get("d1CNBaseUrl") + this.get("d1CNService") + "/groups/");
+						this.set("groupsUrl", this.get("cnBaseURL") + this.get("d1CNService") + "/groups/");
 				}
 
 				if(typeof this.get("d1LogServiceUrl") != "undefined")
-					this.set('d1LogServiceUrl', this.get('d1CNBaseUrl') + this.get('d1CNService') + '/query/logsolr/?');
+					this.set('d1LogServiceUrl', this.get('cnBaseURL') + this.get('d1CNService') + '/query/logsolr/?');
 
-				this.set("nodeServiceUrl", this.get("d1CNBaseUrl") + this.get("d1CNService") + "/node/");
-				this.set('resolveServiceUrl', this.get('d1CNBaseUrl') + this.get('d1CNService') + '/resolve/');
+				this.set("nodeServiceUrl", this.get("cnBaseURL") + this.get("d1CNService") + "/node/");
+				this.set('resolveServiceUrl', this.get('cnBaseURL') + this.get('d1CNService') + '/resolve/');
 
 				//Token URLs
 				if(typeof this.get("tokenUrl") != "undefined"){
-					this.set("portalUrl", this.get("d1CNBaseUrl") + "portal/");
-					this.set("tokenUrl",  this.get("portalUrl") + "token");
+					this.set("portalUrl", this.get("cnBaseURL") + "/portal");
+					this.set("tokenUrl",  this.get("portalUrl") + "/token");
 
-					this.set("checkTokenUrl", this.get("d1CNBaseUrl") + this.get("d1CNService") + "/diag/subject");
+					this.set("checkTokenUrl", this.get("cnBaseURL") + this.get("d1CNService") + "/diag/subject");
 
 					//The sign-in and out URLs - allow these to be turned off by removing them in the defaults above (hence the check for undefined)
 					if(typeof this.get("signInUrl") !== "undefined")
-						this.set("signInUrl", this.get('portalUrl') + "startRequest?target=");
+						this.set("signInUrl", this.get('portalUrl') + "/startRequest?target=");
 					if(typeof this.get("signInUrlOrcid") !== "undefined")
-						this.set("signInUrlOrcid", this.get('portalUrl') + "oauth?action=start&target=");
+						this.set("signInUrlOrcid", this.get('portalUrl') + "/oauth?action=start&target=");
 					if(typeof this.get("signInUrlLdap") !== "undefined")
-						this.set("signInUrlLdap", this.get('portalUrl') + "ldap?target=");
+						this.set("signInUrlLdap", this.get('portalUrl') + "/ldap?target=");
 					if(this.get('orcidBaseUrl'))
 						this.set('orcidSearchUrl', this.get('orcidBaseUrl') + '/v1.1/search/orcid-bio?q=');
 
 					if((typeof this.get("signInUrl") !== "undefined") || (typeof this.get("signInUrlOrcid") !== "undefined"))
-						this.set("signOutUrl", this.get('portalUrl') + "logout");
+						this.set("signOutUrl", this.get('portalUrl') + "/logout");
 
 				}
 
 				// Object format list
         if ( typeof this.get("formatsUrl") != "undefined" ) {
              this.set("formatsServiceUrl",
-             this.get("d1CNBaseUrl") + this.get("d1CNService") + this.get("formatsUrl"));
+             this.get("cnBaseURL") + this.get("d1CNService") + this.get("formatsUrl"));
         }
 
 				//ORCID search
@@ -243,7 +232,7 @@ define(['jquery', 'underscore', 'backbone'],
 			}
 
 			//The package service for v2 DataONE API
-			this.set('packageServiceUrl', this.get('baseUrl') + this.get('context') + this.get('d1Service') + '/packages/application%2Fbagit-097/');
+			this.set('packageServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/packages/application%2Fbagit-097/');
 
 			this.on("change:pid", this.changePid);
 

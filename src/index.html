@@ -3,7 +3,7 @@
 
 <head>
   <script type="text/javascript">
-    var configURL = "http://metacatui.localhost/config.js";
+    var configURL = "http://metacatui.localhost/metacatui/config.js";
   </script>
 
 <style>
@@ -18,30 +18,64 @@
 
     <script type="text/javascript">
 
-      var xhr = new XMLHttpRequest(),
-          MetacatUI = {};
+      var MetacatUI = {};
 
-      xhr.onreadystatechange = function() {
+      MetacatUI.setConfig = function() {
         if (this.readyState == 4 && this.status == 200) {
-            MetacatUI.config = JSON.parse(this.responseText);
-            MetacatUI.root = MetacatUI.config.root;
-            MetacatUI.cacheBuster = MetacatUI.config.cacheBuster;
-            console.log(MetacatUI.config);
 
-          var script = document.createElement("script");
-          script.setAttribute("type", "text/javascript");
-          script.setAttribute("id", "entrypoint");
-          script.setAttribute("data-main", MetacatUI.root + "/js/app");
-          script.setAttribute("src", MetacatUI.root + "/components/require.js?v=" + MetacatUI.cacheBuster);
-          document.getElementsByTagName("body")[0].appendChild(script);
+          //Set the app configuration
+          MetacatUI.config = eval(this.responseText);
+
+          //Set the root on the MetacatUI global object
+          MetacatUI.root = MetacatUI.config.root;
+
+          //If there is a theme, get it
+          if( MetacatUI.config.themeURL ){
+            MetacatUI.getTheme();
+          }
+          //Otherwise, start the app
+          else{
+            MetacatUI.startApp();
+          }
         }
       }
 
-      xhr.open("GET", configURL);
+      //Get the theme config file
+      MetacatUI.getTheme = function(){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", MetacatUI.config.themeURL + "/config.js", true);
+        xhr.responseType = "text";
+
+        xhr.onreadystatechange = function(){
+          if (this.readyState == 4 && this.status == 200) {
+            MetacatUI.config.themeConfig = eval(this.responseText);
+          }
+
+          MetacatUI.startApp();
+        }
+
+        xhr.send();
+      }
+
+      //Load the app entrypoint via RequireJS
+      MetacatUI.startApp = function() {
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        script.setAttribute("id", "entrypoint");
+        script.setAttribute("data-main", MetacatUI.root + "/js/app");
+        script.setAttribute("src", MetacatUI.root + "/components/require.js?v=" + MetacatUI.config.cacheBuster);
+        document.getElementsByTagName("body")[0].appendChild(script);
+      }
+
+      var xhr = new XMLHttpRequest();
+      //When the app config file is loaded, set the configuration
+      xhr.onreadystatechange = MetacatUI.setConfig;
+      xhr.open("GET", configURL, true);
       xhr.responseType = "text";
       xhr.send();
 
     </script>
+
 
 </body>
 

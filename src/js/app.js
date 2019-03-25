@@ -10,31 +10,8 @@ MetacatUI = Object.assign((function() {
     /* The application object to export */
     return {
 
-        /* The current app version */
-      //  metacatUIVersion: "2.0.0RC4",
-
-        /* Get the metacat context from the index document, fallback to "metacat" */
-        /* TODO: Move this to the theme configuration */
-        getMetacatContext: function() {
-            var context = document.getElementById("entrypoint").getAttribute("data-metacat-context");
-            return ((typeof context === "string" && context != "") ? context : "metacat");
-        },
-
-        /* Get the google maps key from the index document, fallback to null */
-        /* TODO: Move this to the default Map model */
-        getMapKey: function() {
-            var key = document.getElementById("entrypoint").getAttribute("data-map-key");
-            if ( (key === "YOUR-GOOGLE-MAPS-API-KEY") || (!key) ) {
-                return null;
-            }
-            return ((typeof key === "string" && key != "") ? key : null);
-        },
-
         /* Default to using D3 SVG rendering */
         useD3: true,
-
-        /* Support manual login verification */
-        recaptchaURL: "https://www.google.com/recaptcha/api/js/recaptcha_ajax",
 
         /* Provide polyfills for older browsers */
         preventCompatabilityIssues: function() {
@@ -365,13 +342,6 @@ MetacatUI = Object.assign((function() {
 })()
 , MetacatUI);
 
-/* TODO: Move both of these into theme configuration */
-/* Set the metacat context */
-MetacatUI.metacatContext = MetacatUI.getMetacatContext();
-
-/* Set the map key */
-MetacatUI.mapKey = MetacatUI.getMapKey();
-
 /* Set the polyfills */
 MetacatUI.preventCompatabilityIssues();
 
@@ -402,10 +372,10 @@ if ( MetacatUI.useD3 ) {
 require.config({
   baseUrl: MetacatUI.root + '/js/',
   waitSeconds: 180, //wait 3 minutes before throwing a timeout error
-  map: MetacatUI.themeMap,
+  map: MetacatUI.config.themeConfig? MetacatUI.config.themeConfig.themeMap : {},
   urlArgs: "v=" + MetacatUI.cacheBuster,
   paths: {
-    jquery: '/components/jquery-1.9.1.min',
+    jquery: MetacatUI.root + '/components/jquery-1.9.1.min',
     jqueryui: MetacatUI.root + '/components/jquery-ui.min',
     jqueryform: MetacatUI.root + '/components/jquery.form',
     underscore: MetacatUI.root + '/components/underscore-min',
@@ -415,7 +385,6 @@ require.config({
     jws: MetacatUI.root + '/components/jws-3.2.min',
     jsrasign: MetacatUI.root + '/components/jsrsasign-4.9.0.min',
     async: MetacatUI.root + '/components/async',
-    recaptcha: [MetacatUI.recaptchaURL, 'scripts/placeholder'],
 	nGeohash: MetacatUI.root + '/components/geohash/main',
 	fancybox: MetacatUI.root + '/components/fancybox/jquery.fancybox.pack', //v. 2.1.5
     annotator: MetacatUI.root + '/components/annotator/v1.2.10/annotator-full',
@@ -509,10 +478,7 @@ function(Bootstrap, AppView, AppModel) {
 	'use strict';
 
 	// initialize the application
-	MetacatUI.appModel = new AppModel({context: '/' + MetacatUI.metacatContext});
-
-	//Check for custom settings in the theme config file
-	if(typeof MetacatUI.customAppConfig == "function") MetacatUI.customAppConfig();
+	MetacatUI.appModel = new AppModel(MetacatUI.config);
 
 	/* Now require the rest of the libraries for the application */
 	require(['underscore', 'backbone', 'routers/router', 'collections/SolrResults', 'models/Search',

@@ -13,9 +13,16 @@
     <link href="<%= MetacatUI.root %>/css/bootstrap.min.css" type="text/css" rel="stylesheet">
     <link href="<%= MetacatUI.root %>/css/font-awesome-3.2.1.min.css" type="text/css" rel="stylesheet">
     <link href="<%= MetacatUI.root %>/css/metacatui-common.css?v=<%=MetacatUI.metacatUIVersion%>" type="text/css" rel="stylesheet">
-    <link href="<%= MetacatUI.root %>/js/themes/<%=MetacatUI.appModel.get('theme')%>/css/metacatui.css?v=<%=MetacatUI.metacatUIVersion%>" type="text/css" rel="stylesheet">
+
+    <% if( MetacatUI.appModel.get("themeURL") ){ %>
+    <link href="<%=MetacatUI.appModel.get('themeURL')%>/css/metacatui.css?v=<%=MetacatUI.metacatUIVersion%>" type="text/css" rel="stylesheet">
+    <% } %>
+
     <link href="<%= MetacatUI.root %>/css/metacatui-common.responsive.css?v=<%=MetacatUI.metacatUIVersion%>" type="text/css" rel="stylesheet">
-    <link href="<%= MetacatUI.root %>/js/themes/<%=MetacatUI.appModel.get('theme')%>/css/metacatui.responsive.css?v=<%=window.metacatUIVersion%>" type="text/css" rel="stylesheet">
+
+    <% if( MetacatUI.appModel.get("themeURL") ){ %>
+    <link href="<%=MetacatUI.appModel.get('themeURL')%>/css/metacatui.responsive.css?v=<%=window.metacatUIVersion%>" type="text/css" rel="stylesheet">
+    <% } %>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>

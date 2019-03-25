@@ -7,7 +7,7 @@ define(['jquery', 'underscore', 'backbone', 'x2js', 'models/formats/ObjectFormat
     /*
      * ObjectFormats represents the DataONE object format list
      * found at https://cn.dataone.org/cn/v2/formats, or
-     * the Coordinating Node environment configured `AppModel.d1CNBaseUrl`
+     * the Coordinating Node environment configured `AppModel.cnBaseURL`
      * This collection is intended to be used as a formats cache -
      * retrieved once, and only refreshed later if an object format
      * isn't present when needed.

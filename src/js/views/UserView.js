@@ -1131,7 +1131,7 @@ define(['jquery', 'underscore', 'backbone', 'clipboard', 'collections/UserGroup'
 				return;
 
 			var expires    = this.model.get("expires"),
-				rTokenName = (MetacatUI.appModel.get("d1CNBaseUrl").indexOf("cn.dataone.org") > -1)? "dataone_token" : "dataone_test_token",
+				rTokenName = (MetacatUI.appModel.get("cnBaseURL").indexOf("cn.dataone.org") > -1)? "dataone_token" : "dataone_test_token",
 				rToken = 'options(' + rTokenName +' = "' + token + '")',
 				matlabToken = "import org.dataone.client.run.RunManager; mgr = RunManager.getInstance(); mgr.configuration.authentication_token = '" + token + "';",
 				tokenInput = $(document.createElement("textarea")).attr("type", "text").attr("rows", "5").addClass("token copy").text(token),

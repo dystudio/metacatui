@@ -369,7 +369,7 @@ define(['jquery', 'underscore', 'backbone', 'rdflib', "uuid", "md5",
               try {
 
                 //First, make sure we are only using one CN Base URL in the RDF or the RDF parsing will fail.
-                var cnResolveUrl = MetacatUI.appModel.get('d1CNBaseUrl') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
+                var cnResolveUrl = MetacatUI.appModel.get('cnBaseURL') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
                 response = response.replace(/cn-\S+.test.dataone.org\/cn\/v\d\/resolve/g, "cn.dataone.org/cn/v2/resolve");
 
                 this.rdf.parse(response, this.dataPackageGraph, this.url(), 'application/rdf+xml');
@@ -1576,7 +1576,7 @@ define(['jquery', 'underscore', 'backbone', 'rdflib', "uuid", "md5",
               CITO =    rdf.Namespace(this.namespaces.CITO),
               XSD =     rdf.Namespace(this.namespaces.XSD);
 
-          var cnResolveUrl = MetacatUI.appModel.get('d1CNBaseUrl') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
+          var cnResolveUrl = MetacatUI.appModel.get('cnBaseURL') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
 
           /* Check if this package member had provenance relationships added
               or deleted by the provenance editor functionality of the ProvChartView
@@ -1786,7 +1786,7 @@ define(['jquery', 'underscore', 'backbone', 'rdflib', "uuid", "md5",
           var rdf = this.rdf;
           var graph = this.dataPackageGraph;
           var stmts = null;
-          var cnResolveUrl = MetacatUI.appModel.get('d1CNBaseUrl') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
+          var cnResolveUrl = MetacatUI.appModel.get('cnBaseURL') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
           var RDF = rdf.Namespace(this.namespaces.RDF),
               DCTERMS = rdf.Namespace(this.namespaces.DCTERMS),
               PROV    = rdf.Namespace(this.namespaces.PROV),
@@ -1820,7 +1820,7 @@ define(['jquery', 'underscore', 'backbone', 'rdflib', "uuid", "md5",
             var graph = this.dataPackageGraph;
             var stmts = null;
             var testNode = null;
-            var cnResolveUrl = MetacatUI.appModel.get('d1CNBaseUrl') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
+            var cnResolveUrl = MetacatUI.appModel.get('cnBaseURL') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
 
             // First see if the execution exists in the RDF graph as a 'bare' idenfier, i.e.
             // a 'urn:uuid'.
@@ -1857,7 +1857,7 @@ define(['jquery', 'underscore', 'backbone', 'rdflib', "uuid", "md5",
                 var programNode = null;
                 var associationId = null;
                 var associationNode = null;
-                var cnResolveUrl = MetacatUI.appModel.get('d1CNBaseUrl') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
+                var cnResolveUrl = MetacatUI.appModel.get('cnBaseURL') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
 
                 if(!executionId.length) {
                     // This is a new execution, so create new execution and association ids
@@ -1910,7 +1910,7 @@ define(['jquery', 'underscore', 'backbone', 'rdflib', "uuid", "md5",
                 var graph = this.dataPackageGraph;
                 var rdf = this.rdf;
                 var stmts = null;
-                var cnResolveUrl = MetacatUI.appModel.get('d1CNBaseUrl') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
+                var cnResolveUrl = MetacatUI.appModel.get('cnBaseURL') + MetacatUI.appModel.get('d1CNService') +  '/resolve/';
                 var RDF = rdf.Namespace(this.namespaces.RDF),
                 DCTERMS = rdf.Namespace(this.namespaces.DCTERMS),
                 PROV    = rdf.Namespace(this.namespaces.PROV),
