@@ -1,22 +1,17 @@
-MetacatUI.theme = MetacatUI.theme || "default";
-MetacatUI.themeTitle = "DataONE Data Catalog"; 
-MetacatUI.themeMap =
-{
-	'*': {
-		// example overrides are provided here
-		'templates/navbar.html' : MetacatUI.root + '/js/themes/' + MetacatUI.theme + '/templates/navbar.html',
-		'templates/footer.html' : MetacatUI.root + '/js/themes/' + MetacatUI.theme + '/templates/footer.html',
-		'templates/about.html' : MetacatUI.root + '/js/themes/' + MetacatUI.theme + '/templates/about.html',
-		'templates/alert.html' : MetacatUI.root + '/js/themes/' + MetacatUI.theme + '/templates/alert.html',
-		'templates/dataSource.html' : MetacatUI.root + '/js/themes/' + MetacatUI.theme + '/templates/dataSource.html',
-		'templates/login.html' : MetacatUI.root + '/js/themes/' + MetacatUI.theme + '/templates/login.html',
-		'templates/resultsItem.html' : MetacatUI.root + '/js/themes/' + MetacatUI.theme + '/templates/resultsItem.html',
-		'templates/noResults.html' : MetacatUI.root + '/js/themes/' + MetacatUI.theme + '/templates/noResults.html',
-		'models/AppModel' : MetacatUI.root + '/js/themes/' + MetacatUI.theme + '/models/AppModel.js',
-		'routers/router' : MetacatUI.root + '/js/themes/' + MetacatUI.theme + '/routers/router.js'
-		}
-};
-
-MetacatUI.customAppConfig = function(){
-
+MetacatUI.theme = {
+  "themeName" : "dataone",
+  "themeMap": {
+    '*': {
+      // example overrides are provided here
+      'templates/navbar.html' : MetacatUI.config.themeURL + '/templates/navbar.html',
+      'templates/footer.html' : MetacatUI.config.themeURL + '/templates/footer.html',
+      'templates/about.html' : MetacatUI.config.themeURL + '/templates/about.html',
+      'templates/alert.html' : MetacatUI.config.themeURL + '/templates/alert.html',
+      'templates/dataSource.html' : MetacatUI.config.themeURL + '/templates/dataSource.html',
+      'templates/login.html' : MetacatUI.config.themeURL + '/templates/login.html',
+      'templates/resultsItem.html' : MetacatUI.config.themeURL + '/templates/resultsItem.html',
+      'templates/noResults.html' : MetacatUI.config.themeURL + '/templates/noResults.html',
+      'routers/router' : MetacatUI.config.themeURL + '/routers/router.js'
+    }
+  }
 }
