@@ -111,7 +111,6 @@ function ($, _, Backbone) {
 
 		renderHelp: function(page, anchorId){
 			this.routeHistory.push("help");
-			MetacatUI.appModel.set('anchorId', anchorId);
 
 			if(page)
 				var pageName = this.helpPages[page];
@@ -128,7 +127,6 @@ function ($, _, Backbone) {
 
 		renderAbout: function (anchorId) {
 			this.routeHistory.push("about");
-			MetacatUI.appModel.set('anchorId', anchorId);
 			var options = {
 					pageName: "about",
 					anchorId: anchorId
@@ -139,7 +137,6 @@ function ($, _, Backbone) {
 
 		renderAPI: function (anchorId) {
 			this.routeHistory.push("api");
-			MetacatUI.appModel.set('anchorId', anchorId);
 			var options = {
 					pageName: "api",
 					anchorId: anchorId
@@ -209,7 +206,6 @@ function ($, _, Backbone) {
 
 		renderTools: function (anchorId) {
 			this.routeHistory.push("tools");
-			MetacatUI.appModel.set('anchorId', anchorId);
 
 			var options = {
 					pageName: "tools",
@@ -378,12 +374,11 @@ function ($, _, Backbone) {
 
 		renderMetadata: function (pid) {
 			this.routeHistory.push("metadata");
-			MetacatUI.appModel.set('lastPid', MetacatUI.appModel.get("pid"));
 
 			var seriesId;
 
 			//Check for a seriesId
-			if(MetacatUI.appModel.get("useSeriesId") && (pid.indexOf("version:") > -1)){
+			if( pid.indexOf("version:") > -1 ){
 				seriesId = pid.substr(0, pid.indexOf(", version:"));
 
 				pid = pid.substr(pid.indexOf(", version: ") + ", version: ".length);

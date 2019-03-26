@@ -23,9 +23,6 @@ define(['jquery', 'underscore', 'backbone'],
 			page: 0,
 
 			previousPid: null,
-			lastPid: null,
-
-			anchorId: null,
 
 			userProfiles: true,
 			profileUsername: null,
@@ -68,8 +65,7 @@ define(['jquery', 'underscore', 'backbone'],
 
 			mnBaseURL: window.location.origin || (window.location.protocol + "//" + window.location.host),
 			allowAccessPolicyChanges: true,
-			// the most likely item to change is the Metacat deployment context
-			context: '/metacat',
+
 			d1Service: '/d1/mn/v2',
 			cnBaseURL: "https://cn.dataone.org",
 			d1CNService: "/cn/v2",
@@ -221,21 +217,16 @@ define(['jquery', 'underscore', 'backbone'],
              this.set("formatsServiceUrl",
              this.get("cnBaseURL") + this.get("d1CNService") + this.get("formatsUrl"));
         }
-
-				//ORCID search
-				if(typeof this.get("orcidBaseUrl") != "undefined")
-					this.set('orcidSearchUrl', this.get('orcidBaseUrl') + '/search/orcid-bio?q=');
-
-				//Turn the seriesId feature on
-				if(typeof this.get("useSeriesId") != "undefined")
-					this.set("useSeriesId", true);
 			}
+
+      //ORCID search
+      if(typeof this.get("orcidBaseUrl") != "undefined")
+        this.set('orcidSearchUrl', this.get('orcidBaseUrl') + '/search/orcid-bio?q=');
 
 			//The package service for v2 DataONE API
 			this.set('packageServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/packages/application%2Fbagit-097/');
 
 			this.on("change:pid", this.changePid);
-
 
 		},
 
