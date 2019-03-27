@@ -150,7 +150,13 @@ define(['jquery',
 			if(this.parentView && this.parentView.model){
 				var formatId = this.parentView.model.get("formatId");
 				if(formatId.indexOf("eml://") >= 0){
-					var url = MetacatUI.appModel.get("objectServiceUrl") + this.parentView.model.get("id");
+          var url;
+          if( MetacatUI.appModel.get("d1Service").indexOf("cn") > -1 ){
+            url = MetacatUI.appModel.get('resolveServiceUrl') + encodeURIComponent(this.parentView.model.get("id"));
+          }
+          else{
+             url = MetacatUI.appModel.get('objectServiceUrl') + encodeURIComponent(this.parentView.model.get("id"));
+          }
 
 					var requestSettings = {
 						url: url,

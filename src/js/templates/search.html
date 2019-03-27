@@ -35,7 +35,7 @@
 		    </div>
     		<div class="filter-container collapsable">
 				<h5 id="filters-header">Filter by:</h5>
-				
+
 				<div class="filter-contain collapsable" data-category="attribute">
 					<label class="expand-collapse-control">
 						<i class="icon icon-caret-right expand"></i>
@@ -51,7 +51,7 @@
 					</div>
 				    <div class="clear"></div>
 			    </div>
-							    
+
 			    <% if(searchModelRef.filterIsAvailable("annotation")){ %>
 			    <div class="filter-contain collapsable" data-category="annotation">
 					<label class="expand-collapse-control">
@@ -68,13 +68,13 @@
 					</div>
 				    <div class="clear"></div>
 			    </div>
-			    
+
 			    <% } %>
-			    
+
 			   <% if(searchModelRef.filterIsAvailable("documents")){ %>
 				   <div class="filter-contain collapsable" id="includes-files" data-category="documents">
 						<label class="expand-collapse-control">
-							<i class="icon icon-caret-right expand"></i>					
+							<i class="icon icon-caret-right expand"></i>
 							<i class="icon icon-caret-down collapse"></i>
 							<img src="<%= MetacatUI.root %>/img/data-table.png" class="icon" />
 							<span class="tooltip-this" data-trigger="hover" data-title="Check this to only view datasets that include downloadable data files" data-placement="top">
@@ -109,7 +109,7 @@
 						</div>
 					</div>
 				<% } %>
-				
+
 				<div class="filter-contain collapsable">
 					<label class="expand-collapse-control">
 						<i class="icon icon-caret-right expand"></i>
@@ -243,7 +243,7 @@
 							</div>
 					</div>
 
-					<div class="row-fluid pagination pagination-centered">
+					<div class="row-fluid pagination">
 						<div class="resultspager"></div>
 					</div>
 				</div>

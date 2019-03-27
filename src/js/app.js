@@ -346,8 +346,8 @@ MetacatUI = Object.assign((function() {
 MetacatUI.preventCompatabilityIssues();
 
 /* Optionally set up the map */
-if( MetacatUI.mapKey ){
-    var gmapsURL = "https://maps.googleapis.com/maps/api/js?v=3&key=" + MetacatUI.mapKey;
+if( MetacatUI.config.googleMapsKey ){
+    var gmapsURL = "https://maps.googleapis.com/maps/api/js?v=3&key=" + MetacatUI.config.googleMapsKey;
     define("gmaps",
         ["async!" + gmapsURL],
         function() {

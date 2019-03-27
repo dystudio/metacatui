@@ -793,7 +793,7 @@ define(['jquery',
 							  "&visible=" + latLngSW.lat()+","+latLngSW.lng()+"|"+latLngNW.lat()+","+latLngNW.lng()+"|"+latLngNE.lat()+","+latLngNE.lng()+"|"+latLngSE.lat()+","+latLngSE.lng()+"|"+latLngSW.lat()+","+latLngSW.lng()+
 							  "&zoom=4" +
 							  "&sensor=false" +
-							  "&key=" + MetacatUI.mapKey + "'/>";
+							  "&key=" + MetacatUI.appModel.get("googleMapsKey") + "'/>";
 
 				//Find the spot in the DOM to insert our map image
 				if(parseText) var insertAfter = ($(georegion).find('label:contains("West")').parent().parent().length) ? $(georegion).find('label:contains("West")').parent().parent() :  georegion; //The last coordinate listed
@@ -1897,10 +1897,19 @@ define(['jquery',
 					var title = "";
 					container = viewRef.el;
 				}
+
+        var url;
+        if( MetacatUI.appModel.get("d1Service").indexOf("cn") > -1 ){
+          url = MetacatUI.appModel.get('resolveServiceUrl') + encodeURIComponent(pdfs[i].id);
+        }
+        else{
+           url = MetacatUI.appModel.get('objectServiceUrl') + encodeURIComponent(pdfs[i].id);
+        }
+
 				//Create an element using the dataDisplay template
 				html = this.dataDisplayTemplate({
 					 type : "pdf",
-					  src : (MetacatUI.appModel.get('objectServiceUrl') || MetacatUI.appModel.get('resolveServiceUrl')) + pdfs[i].id,
+					  src : url,
 					title : title
 				});
 
@@ -1975,7 +1984,14 @@ define(['jquery',
 					//Clean up the link text
 					var withoutPrefix = linkText.substring(linkText.indexOf("ecogrid://") + 10),
 						pid = withoutPrefix.substring(withoutPrefix.indexOf("/")+1),
-						baseUrl = MetacatUI.appModel.get('resolveServiceUrl') || MetacatUI.appModel.get('objectServiceUrl');
+						baseUrl;
+
+            if( MetacatUI.appModel.get("d1Service").indexOf("cn") > -1 ){
+              baseUrl = MetacatUI.appModel.get('resolveServiceUrl');
+            }
+            else{
+               baseUrl = MetacatUI.appModel.get('objectServiceUrl');
+            }
 
 					$(thisLink).attr('href', baseUrl + encodeURIComponent(pid)).text(pid);
 			});

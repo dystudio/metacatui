@@ -14,10 +14,11 @@ define(['jquery', 'underscore', 'backbone'],
 			emailContact: "knb-help@nceas.ucsb.edu",
 
 			googleAnalyticsKey: null,
+      googleMapsKey: null,
 
 			nodeId: null,
 
-			searchMode: MetacatUI.mapKey ? 'map' : 'list',
+			searchMode: MetacatUI.config.googleMapsKey ? 'map' : 'list',
 			searchHistory: [],
 			sortOrder: 'dateUploaded+desc',
 			page: 0,
@@ -161,8 +162,15 @@ define(['jquery', 'underscore', 'backbone'],
 			this.set('authServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/isAuthorized/');
 			this.set('queryServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/query/solr/?');
 			this.set('metaServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/meta/');
-			this.set('objectServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/object/');
-			this.set('metacatServiceUrl', this.get('mnBaseURL') + '/metacat');
+
+      if( this.get('d1Service').indexOf("cn") > -1 ){
+        this.set('objectServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/resolve/');
+      }
+      else{
+        this.set('objectServiceUrl', this.get('mnBaseURL') + this.get('d1Service') + '/object/');
+      }
+
+      this.set('metacatServiceUrl', this.get('mnBaseURL') + '/metacat');
 
 			if(typeof this.get("grantsUrl") !== "undefined")
 				this.set("grantsUrl", "https://api.nsf.gov/services/v1/awards.json");

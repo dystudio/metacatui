@@ -1,3 +1,6 @@
+#loading-app{
+	display: none;
+}
 
 /******************************************
 ** General Styling ***
@@ -10,6 +13,27 @@ a:hover{
 }
 .subtle{
 	color: #999;
+}
+.pointer{
+  cursor: pointer;
+}
+.lead{
+  font-weight: 400;
+}
+.center{
+  margin: 0 auto;
+  float: none;
+}
+.clear{
+  clear: both;
+}
+.hidden,
+#clear-all.hidden,
+a [class^="icon-"].hidden{
+  display: none;
+}
+article, aside, figure, footer, header, hgroup, menu, nav, section {
+  display:block;
 }
 .btn-disabled{
 	pointer-events: none;
@@ -91,6 +115,25 @@ a:hover{
 .row-striped > .row-fluid:nth-child(even){
 	background-color: #EFEFEF;
 }
+h1 > a[name], h2 > a[name], h3 > a[name],
+h4 > a[name], h5 > a[name], h6 > a[name] {
+  color: #555555;
+  text-decoration: none;
+  z-index: 20; /*keeps hidden anchor tags from blocking content*/
+}
+
+/* make sure the anchors render with padding-top */
+h1 > a[name]:before, h2 > a[name]:before, h3 > a[name]:before,
+h4 > a[name]:before, h5 > a[name]:before, h6 > a[name]:before {
+content: "";
+	padding-top: 115px;
+}
+/** Ellipsis Styles - both single line and multi-line, which needs particular markup structure to work. See http://codepen.io/romanrudenko/pen/ymHFh **/
+.ellipsis{
+text-overflow: ellipsis;
+overflow: hidden;
+white-space: nowrap;
+}
 /******************************************
 ** General Structure ***
 ******************************************/
@@ -113,7 +156,7 @@ article.container {
 	width: 96%;
 }
 #Content{
-    padding: 40px 40px 40px 40px;
+  padding: 60px 40px 110px 40px;
 }
 .DataCatalog #Content{
 	box-sizing: border-box;
@@ -149,10 +192,159 @@ footer{
 	/** Keeps the footer down **/
 	min-height: 100%;
 }
+/* FOOTER CSS
+-------------------------------------------------- */
 
+    #Footer {
+		background: #222;
+		background-color: rgba(0,0,0,0.8);
+		padding: 5px 2%;
+		width: 96%;
+		height: 100px;
+		color: #DDD;
+		display: block;
+    }
+
+    .mapMode #Footer{
+		height: 20px;
+  		overflow: hidden;
+    }
+    footer#Footer h2 {
+      font-size: 15px;
+      line-height: 15px;
+      color: #BBB;
+      padding: 0;
+      display: inline;
+      margin-left: 2%;
+    }
+#Footer .subtle{ font-size: .8em; }
+    footer#Footer .helpitems {
+      list-style: none;
+    }
+
+    footer#Footer .helpitems li{
+      margin: 0px 0px 0px 5px;
+    }
+
+    ul.helpitems a {
+      color: #CCC;
+      font-weight: 400;
+      font-size: 13px;
+
+    }
+
+    ul.helpitems a:hover{
+    	color: #3399CC;
+    	text-decoration: none;
+    }
+
+
+    #Footer img {
+      opacity: .6;
+    }
+
+    #Footer img:hover{
+    	opacity: 1;
+    	transition: opacity 1s;
+    }
+    .nceas{
+    	width: 60px;
+    }
+    .metacat{
+    	width: 60px;
+    	margin-left: 10px;
+    }
+
+    .dataone{
+    	width: 100px;
+    	margin-left: 10px;
+    }
+/* --------------------------------------------------
+   BUTTONS CSS
+-------------------------------------------------- */
+.btn{
+ border-radius: 3px;
+ -moz-border-radius: 3px;
+ -webkit-border-radius: 3px;
+   border-color: #CCC;
+   color: #444444;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+   padding: 6px 12px;
+   text-shadow: none;
+}
+.btn-primary,
+.data-package-item .btn-primary {
+ background-color: #166194;
+ color: #FFFFFF;
+ border-color: #155988;
+}
+.btn-primary:hover{
+ background-color: #0377DD;
+ border-color: #0377DD;
+}
+
+.btn-primary a, .btn-info a, .btn-success a, .btn-warning a, .btn-danger a, .btn-inverse a {
+ color: #FFFFFF;
+ text-decoration:none;
+}
+.btn-primary[disabled], .btn-primary[disabled]:hover, .btn[disabled], .btn[disabled]:hover {
+ background-color: #999999;
+ color: #FFFFFF;
+ text-shadow: none;
+ border: none;
+}
+.btn-group > .dropdown-toggle {
+ -webkit-border-top-right-radius: 4px;
+ -moz-border-top-right-radius: 4px;
+ border-top-right-radius: 4px;
+ -webkit-border-bottom-right-radius: 4px;
+ -moz-border-bottom-right-radius: 4px;
+ border-radius: 4px;
+}
+
+/* Download  and Publish buttons */
+#downloadPackage a.btn {
+   width: 100px;
+   margin-bottom: 8px;
+}
+.download-this-package{
+   clear: both;
+   margin-left: 5px;
+}
+.download-this-package i{
+   margin-left: 10px;
+}
+#downloadPackage .dropdown-toggle {
+ font: 400 20px/20px "Oswald", Arial, sans-serif;
+}
+.download-this-package a.metadata{
+	margin-top: 0px;
+}
+.btn-group.open .btn.dropdown-toggle{
+   color: #166194;
+ background: rgba(22, 97, 148, 0.2);
+}
+.dropdown-menu > li > a.btn{
+   background-color: #FFFFFF;
+   font: 300 18px/18px "Oswald", Arial, sans-serif;
+}
 /******************************************
 ** Navigation ***
 ******************************************/
+#Navbar {
+  top: 0px;
+  width: 100%;
+  position:fixed;
+  z-index: 1;
+}
+#bg_image{
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: background 500ms;
+}
 .breadcrumb{
   width: 100%;
   box-sizing: border-box;
@@ -193,18 +385,115 @@ footer{
    	display: inline-block;
    	width: 60px;
 }
-.nav .input > form > .btn,
-.header .input > form > .btn {
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-	box-shadow: none;
-	background: none;
-	display:inline-block;
-	cursor:pointer;
-	text-decoration:none;
-}
 .nav .right .dropdown-menu {
   left: -50%;
+}
+.btn.direct-search {
+	padding: 4px 8px;
+}
+.navbar {
+  position: relative;
+  border: none;
+  margin: 0px;
+}
+.navbar .nav{
+  float: right;
+  margin: 0px;
+  z-index: 999;
+}
+.mapMode .navbar .nav{
+  z-index: 999;
+}
+.navbar-inner {
+  border: none;
+  background:rgb(0,0,0);
+  background:transparent\9; /* For IE */
+  background:rgba(0,0,0,0);
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00000000,endColorstr=#00000000); /* For IE */
+  zoom: 1; /* For IE */
+  min-height: 0px;
+  box-shadow: none;
+}
+.navbar-inner > ul{
+  margin: 0px;
+}
+.navbar-inner > ul > li img{
+height: 32px;
+margin-top: -10px;
+}
+.navbar .nav > li > a {
+  text-shadow: none;
+  color: #FFF;
+  font-size: 1.5em;
+}
+.navbar .nav > li > a:focus,
+.navbar .nav > li > a:hover {
+  text-decoration: none;
+  text-shadow: none;
+  transition: all .5s;
+}
+.navbar .nav > .active > a,
+.navbar .nav > .active > a:hover,
+.navbar .nav > .active > a:focus {
+  color: #555555;
+  font-weight: 400;
+  text-decoration: none;
+  background-color: #E5E5E5;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: none; /*inset 0 3px 8px rgba(0, 0, 0, 0.125);*/
+     -moz-box-shadow: none; /*inset 0 3px 8px rgba(0, 0, 0, 0.125);*/
+          box-shadow: none; /*inset 0 3px 8px rgba(0, 0, 0, 0.125);*/
+}
+
+.mapMode .navbar .nav > li > a:focus,
+.mapMode .navbar .nav > li > a:hover{
+  text-shadow: none;
+  color: #666;
+  transition: all .5s;
+}
+
+#Navbar form {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+#Navbar .dropdown-toggle > .icon-sort-down{
+  font-size: 15px;
+  width: 5px;
+}
+
+#Navbar .dropdown-menu{
+  left: -90px;
+}
+
+#Navbar .dropdown-menu:before,
+#Navbar .dropdown-menu:after{
+  left: 80%;
+}
+
+#Navbar .dropdown-menu > li > a:hover{
+  background-color: #166194;
+  background-image: none;
+}
+
+#SignIn {
+  float: right;
+}
+/* Search/ID Input bar in nav bar */
+.nav > .input > form > input[type="text"],
+.nav > .input > form > .btn{
+  position: relative;
+  top: 5px;
+}
+.nav > .input > form > .btn{
+  background-color: #CCC;
+}
+.nav > .input > form > label{
+  position: relative;
+  top: 10px;
+  font-weight: bold;
+  color: white;
 }
 
 /******************************************
@@ -443,13 +732,34 @@ img.icon{
 	 width: calc(100% - 15px);
 	 border-top: 1px solid #EEE;
 }
+#results.loading > .notification{
+ min-height: 500px;
+}
+
+.result-row:nth-child(odd){
+ background-color: #F4F6F8;
+}
+
+.result-row:nth-child(even){
+ background-color: transparent;
+}
+
+.result-row .citation .title{
+ color: #1C6E84;
+}
+.result-row .citation a:hover,
+.result-row .citation a:hover .title,
+.result-row .citation a:hover .id{
+  color: #1C6E84;
+  transition: color .3s;
+}
 .result-row .info-icons .icons{
 	float: left;
     margin-right: 1em;
    	position: relative;
 }
 .result-row .info-icons .icon{
-	font-size: 1.1em;
+	font-size: 1em;
 }
 .result-row .info-icons .icon.inactive{
     visibility: hidden;
@@ -543,6 +853,15 @@ img.icon{
    	display: inline-block;
    	vertical-align: top;
    	position: relative;
+}
+.prov-chart .node > i{
+  color: #166194;
+}
+.prov-chart .node:hover,
+.prov-chart .node:focus,
+.prov-chart .node:hover > i,
+.prov-chart .node:focus > i{
+  color: white;
 }
 .prov-chart.sources{
    	margin-right: 15px;
@@ -1451,6 +1770,11 @@ img.icon{
 #metadata-index-details .entitydetails .size{
 	display: inherit;
 }
+#Metadata > a[href="data"]{
+  display: block;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
 #Metadata  .citation,
 #Content.no-stylesheet .citation,
 #Metadata  > .container > .row-fluid > .citation,
@@ -1489,7 +1813,22 @@ img.icon{
 #Metadata{
 	padding-left: 0px;
 	padding-right: 0px;
-    width: 100%;
+  width: 100%;
+  min-height: 800px;
+}
+#Metadata h4{
+  font-weight: 600;
+}
+#Metadata .nav-header{
+  text-transform: none;
+}
+#Metadata .nav-list > .active > a{
+  font-weight: 700;
+  background-color: #166194;
+  text-shadow: none;
+}
+#Metadata .nav > li > a:hover{
+  text-shadow: none;
 }
 .entitydetails.controls-well > .thumbnail{
 	margin-left: 180px;
@@ -1530,16 +1869,20 @@ body > .alert-container {
 #Metadata #downloadPackage{
 	display: none;
 }
-/* Used in metadata view for metadata format types without stylesheet */
-#Content > pre,
-#Metadata pre {
-    background-color: #EEE;
-    color: #333;
-    font-family: inherit;
-    font-size: 1em;
-}
 #Metadata table .copy{
 	min-width: 50px;
+}
+.table .table-header{
+ background-color: #D8E3EF;
+ color: #333;
+ text-align: center;
+ font-size: 1em;
+}
+.table-header .subtle {
+  color: #777;
+  margin-left: 10px;
+  font-weight: normal;
+  font-size: .9em;
 }
 #Content.no-stylesheet.container{
 	width: 86%;
@@ -1562,6 +1905,23 @@ body > .alert-container {
 .attributeList a{
 	white-space: nowrap;
 	max-width: 100%;
+}
+.controls-well {
+	padding: 4px;
+    background-color: #FFFFFF;
+   	border: 1px solid #DEE1EA;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+.controls-well img{
+  max-width: 90%;
+  max-height: 900px;
+  margin: 0 auto;
+  display: block;
+}
+.control-label {
+	cursor: default;
 }
 .controls-well > .party{
 	margin-bottom: 30px;
@@ -1823,6 +2183,15 @@ i.icon.metric-icon.icon-spinner.icon-spin {
 	padding-top: 22px;
 }
 
+#metric-modal .metric-chart .scale_button:hover rect,
+#metric-modal .metric-chart .bar,
+#metric-modal .metric-chart .bar_context {
+	fill: #0E69A1;
+}
+
+#metric-modal .metric-chart .bar {
+	stroke: #0E69A1;
+}
 
 /******************************************
 * Search Page / Data Catalog Page Metrics
@@ -1988,19 +2357,13 @@ i.catalog-metric-icon {
 
 #metric-modal .metric-chart .bar,
 #metric-modal .metric-chart .bar_context {
-	fill: black;  /* change for each theme */
 	stroke-width: 0;
 	clip-path: url(#clip);
 }
 
 #metric-modal .metric-chart .bar {
-	stroke: black; /* change for each theme */
 	cursor: default;
 }
-
-/* --- context bars --- */
-
-
 /*
 	--- PANE CURSORS ---		[metric modal chart]
 */
@@ -2369,6 +2732,29 @@ a.btn.metrics-button-disabled {
 	float: right;
 }
 /******************************************
+-- Popovers --
+******************************************/
+.popover{
+  font-size: 13px;
+}
+
+.popover-title {
+  word-break: break-word;
+}
+
+.popover-content {
+  word-break: break-word;
+}
+
+ .abstract-popover{
+  max-height: 500px;
+  min-height: 10px;
+  width: 250px;
+overflow: hidden;
+  word-break: keep-all;
+  text-overflow: ellipsis;
+}
+/******************************************
 * Images, Maps, and Media
 ********************************************/
 .thumbnail{
@@ -2411,12 +2797,15 @@ img[src*="gstatic.com/"].georegion-map,
 img[src*="googleapis.com/"].georegion-map{
 	max-width: 100%;
 }
-.figure{
-	margin-top: 20px;
-	margin-bottom: 20px;
-	max-width: 100%;
-	margin-right: auto;
-	margin-left: auto;
+/* Google Map Images for Geographic Region */
+.georegion-map{
+  margin-left: 125px;
+  margin-bottom: 10px;
+  border: 1px solid #DDD;
+  padding: 7px;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
 }
 .media {
   margin-top: 15px;
@@ -2470,6 +2859,28 @@ img[src*="googleapis.com/"].georegion-map{
   padding-left: 0;
   list-style: none;
 }
+.figure{
+ max-width: 80%;
+ background-color: #FFFFFF;
+ padding: 10px;
+ display: block;
+ border: 1px solid #666666;
+ margin: 20px auto;
+}
+
+.figure > img{
+ max-width: 90%;
+ margin: 10px auto;
+ display: block;
+}
+
+.figure > .caption{
+  margin-bottom: 0px;
+ text-align: center;
+ color: #666;
+ padding-top: 10px;
+}
+
 /******************************************
 * Projects
 ********************************************/
@@ -2727,6 +3138,7 @@ table.download-contents .name{
 table.download-contents .btn-container,
 table.download-contents .btn-container .btn{
 	width: 140px;
+  margin-bottom: 0px;
 }
 .download-contents.service .btn-container .btn{
 	width: 135px;
@@ -3121,8 +3533,7 @@ address.email-container:before{
 }
 .profile .stripe{
 	border-top: 1px dashed #CCC;
-    padding-bottom: 20px;
-    padding-top: 20px;
+  padding: 20px;
 }
 .profile .packages p {
     color: #333;
@@ -3157,14 +3568,29 @@ address.email-container:before{
 .bar-chart.log-scale .tick line{
 	stroke: #EEE;
 }
-
-
-/**** Default Chart Styles *****/
-svg .default,
-.fallback.default{
-	fill: #999;
-	stroke: #999;
-	color: #999;
+.bar-label{
+	fill: #0E69A1;
+	font-size: 14px;
+	font-weight: bold;
+}
+.bar-chart .x.axis .tick text{
+	font-size: 11px;
+}
+.profile .format-charts-container{
+	height: 400px;
+}
+.profile .format-charts-container .chart-title{
+	width: 100%;
+}
+.profile .format-charts{
+	width: 100%;
+}
+.profile .format-charts .chart{
+	width: 50%;
+	margin: 0px;
+}
+#data-coverage-year-range{
+	display: block;
 }
 .donut.default .donut-labels,
 .donut.no-activity .donut-labels{
@@ -3192,6 +3618,13 @@ svg .no-activity,
 	stroke: #CCCCCC;
 	color: #CCCCCC;
 }
+.donut.no-activity > g .donut-arc,
+.donut.data.no-activity > g .donut-arc,
+.donut.metadata.no-activity > g .donut-arc,
+.donut.no-activity .donut-title-count,
+.donut.no-activity .donut-title-text{
+	fill: #CCCCCC;
+}
 .donut.default > g .donut-arc,
 .donut.data.default > g .donut-arc,
 .donut.metadata.default > g .donut-arc,
@@ -3199,9 +3632,270 @@ svg .no-activity,
 .donut.default .donut-title-text{
 	fill: #CCCCCC;
 }
+/* The universal color for data */
+svg .data,
+.fallback.data{
+  color: #90AB05;
+  stroke: #90AB05;
+  fill: #90AB05;
+}
 
+/* The universal color for metadata */
+svg .metadata,
+.fallback.metadata{
+  color: #0E69A1;
+  stroke: #0E69A1;
+  fill: #0E69A1;
+}
 
+/* The universal color for packages */
+.profile .packages,
+svg .packages{
+  color: #05ab8f;
+  fill: #05ab8f;
+  stroke: #05ab8f;
+}
+.profile .bar-label.packages{
+  fill: inherit;
+}
+svg .default{
+  fill: #CCCCCC;
+  stroke: #CCCCCC;
+  color: #CCCCCC;
+}
+/* Donut charts */
+#metadata-chart,
+#data-chart{
+  height: 300px;
+  width: 420px;
+  margin:0px;
+}
+#metadata-chart{
+  float: left;
+  margin: 0px;
+}
+#data-chart{
+  float: left;
+}
+.format-charts{
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+.donut-title-count{
+  font-size: 24px;
+}
+.donut-title-text,
+svg .title{
+  color: #555555;
+  fill: #555555;
+  font-size: 17px;
+  line-height: 17px;
+}
+.donut-arc{
+  transition: opacity .2s;
+}
+.donut-arc.inactive,
+.donut-arc.inactive + .donut-labels{
+  opacity: 0.2;
+}
+.donut-arc.active + .donut-labels,
+.donut-arc.active + .donut-labels .donut-arc-count.rotated{
+  opacity: 1;
+  font-weight: bold;
+}
+.donut-labels{
+  font-size: 14px;
+  opacity: 0.7;
+  transition: opacity .2s;
+}
+.donut-arc-label{
+  font-size: 13px;
+}
+.donut-arc-count.rotated{
+  opacity: 0;
+}
+/* Donut arc colors */
+.donut.metadata > g:nth-child(even) .donut-arc,
+.donut.metadata > g:nth-child(even) .donut-arc-label
+{
+	fill: #118AD5;
+}
+.donut.metadata > g:nth-child(odd) .donut-arc,
+.donut.metadata > g:nth-child(odd) .donut-arc-label{
+	fill: #0E69A1;
+}
+.donut.data > g:nth-child(even) .donut-arc,
+.donut.data > g:nth-child(even) .donut-arc-label
+{
+	fill: #6E8302;
+}
+.donut.data > g:nth-child(odd) .donut-arc,
+.donut.data > g:nth-child(odd) .donut-arc-label{
+	fill: #90AB05;
+}
+/* Have a different color for the first arc so no two colors are adjacent */
+.donut.metadata > g:first-child .donut-arc,
+.donut.metadata > g:first-child .donut-arc-label{
+	fill: #05446A;
+}
 
+.donut.data > g:first-child .donut-arc,
+.donut.data > g:first-child .donut-arc-label{
+	fill: #445200;
+}
+
+.no-activity .donut > g:first-child .donut-arc,
+.no-activity .donut > g .donut-arc-label,
+.no-activity .donut > g .donut-title-text,
+.no-activity .donut > g .donut-title-count{
+	fill: #CCC;
+}
+
+/* Line Chart */
+.upload-chart,
+.temporal-coverage-chart{
+	width: 100%;
+	float: right;
+}
+svg .line{
+	fill: none;
+  	stroke-width: 2px;
+}
+svg .domain{
+	fill: none;
+	stroke-width: 1px;
+	stroke: #555555;
+}
+
+.line-chart-label{
+	font-weight: bold;
+	font-size: 14px;
+	stroke-width: 0px;
+	display: none;
+}
+.line-chart-label.text{
+		fill: #555;
+}
+.line-chart-label.bg{
+	stroke-width: 2px;
+	fill: #FFF;
+	stroke: #FFF;
+	opacity: 0.8;
+}
+.tick line{
+	stroke-width: 1px;
+	stroke: #CCC;
+}
+svg> .title{
+	font-size: 15px;
+}
+svg text{
+	stroke: none;
+	stroke-width: 0px;
+}
+svg .tick text{
+	font-size: 12px;
+	color: #666;
+}
+svg .point:hover ~ .line-chart-label{
+	opacity: 1;
+	transition: all .5s;
+}
+/* Circle Badges */
+.circle-badge{
+	height: auto;
+	max-height: 300px;
+}
+.circle-badge circle{
+	stroke-width: 5px;
+	fill: none;
+}
+.circle-badge .label{
+	stroke-width: 0px;
+	font-size: 13px;
+	font-weight: 300;
+}
+.circle-badge .count{
+	stroke-width: 0px;
+	font-size: 20px;
+}
+
+/******************************************
+** Maps **
+******************************************/
+.gmaps-infowindow{
+	max-height: 400px;
+	overflow-y:scroll;
+	-webkit-transform: translate3d(0,0,0);
+}
+.map-toggle-container{
+	line-height: 2em;
+}
+/* Fixes Infowindow popup problem - interaction with bootstrap? */
+img[src*="gstatic.com/"], img[src*="googleapis.com/"]  {
+    max-width: 99999px;
+}
+
+/******************************************
+** Main Content View **
+******************************************/
+#mainContent{
+	height: 0px;
+	padding: 0px;
+	margin-top: 50px;
+}
+
+#mainContent h1{
+	font: 400 60px/60px "Oswald", Arial, sans-serif;
+	color: #375796;
+	text-transform: uppercase;
+	width: 300px;
+	margin-bottom: 20px;
+}
+
+#mainContent input{
+	height: 90px;
+    border-radius: 8px 0px 0px 8px;
+    -moz-border-radius: 20px 0px 0px 20px;
+    font-size: 30px;
+    border: 2px solid #cacde2;
+    padding-left: 20px;
+    margin-right: 20px;
+    float: left;
+}
+
+#mainContent input::-webkit-input-placeholder{
+	padding-top: 7px;
+}
+#mainContent input:-moz-placeholder{ /* Firefox 18- */
+	padding-top: 7px;
+}
+#mainContent input::-moz-placeholder{ /* Firefox 19+ */
+	padding-top: 7px;
+}
+#mainContent input:-ms-input-placeholder{
+	padding-top: 7px;
+}
+
+#search_btn_main{
+	height: 100px;
+    margin-left: -20px;
+    -webkit-border-radius: 0 8px 8px 0;
+    -moz-border-radius: 0 15px 15px 0;
+    border-left: 0px;
+    background-color: #375796;
+    -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    padding: 0px;
+    width: 100px;
+    background-image: none;
+}
+
+#search_btn_main > i{
+	color: #FFF;
+	font-size: 2em;
+    line-height: 3.1em;
+}
 /******************************************
 ** Panels ***
 ******************************************/
@@ -3332,6 +4026,66 @@ svg .no-activity,
 .list-group-item.create-group a{
 	font-weight: normal;
 }
+/** Backbone override for dropdowns so they dsplay on hover rather than click **/
+.dropdown-menu .sub-menu {
+  left: 100%;
+  position: absolute;
+  top: 0;
+  visibility: hidden;
+  margin-top: -1px;
+}
+
+.dropdown-menu li:hover .sub-menu {
+  visibility: visible;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown:hover .dropdown-menu.hidden,
+.dropdown-menu.hidden{
+display: none;
+}
+
+.navbar .nav li.dropdown.open > .dropdown-toggle{
+color: #FFF;
+background-color: transparent;
+}
+
+.nav-tabs .dropdown-menu, .nav-pills .dropdown-menu, .navbar .dropdown-menu {
+  margin-top: 0;
+}
+.nav-tabs{
+margin-bottom: 0px;
+}
+.nav-tab > a{
+  background-color: rgba(255,255,255, .5);
+  border-radius: 5px 5px 0px 0px;
+  margin-right: 5px;
+}
+.navbar .sub-menu:before {
+  border-bottom: 7px solid transparent;
+  border-left: none;
+  border-right: 7px solid rgba(0, 0, 0, 0.2);
+  border-top: 7px solid transparent;
+  left: -7px;
+  top: 10px;
+}
+.navbar .sub-menu:after {
+  border-top: 6px solid transparent;
+  border-left: none;
+  border-right: 6px solid #fff;
+  border-bottom: 6px solid transparent;
+  left: 10px;
+  top: 11px;
+  left: -6px;
+}
+.dropdown-header{
+  padding: 0px 20px;
+  color: #999;
+}
+
 /******************************************
 ** Searching and Map ***
 ******************************************/
@@ -3418,6 +4172,9 @@ body.mapMode{
 .list-only .map-toggle-container{
 	display: none;
 }
+#countstats:before{
+content: "Datasets ";
+}
 /******************************************
 ** Filters ***
 ******************************************/
@@ -3440,6 +4197,8 @@ body.mapMode{
 }
 .filter.btn{
 	margin-bottom: 0px;
+  border-color: #999;
+  color: #555;
 }
 .filter-contain > label{
    	font-size: 13px;
@@ -3467,6 +4226,8 @@ body.mapMode{
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   font-size: 1em;
+  background-color: #166194;
+  color: #FFF;
 }
 .current-filters,
 .current-filters[class*="span"]{
@@ -3487,8 +4248,12 @@ body.mapMode{
 	font-weight: bold;
 	margin-right: 5px;
 }
-.current-filter > .icon{
-	margin-left: 5px;
+.current-filter .remove-filter{
+  float: right;
+  margin-top: 3px;
+}
+.current-filter .remove-filter:hover{
+  cursor: pointer;
 }
 .current-filters[data-category='resourceMap'] .current-filter .category{
 	margin-right: 0px;
@@ -3549,17 +4314,116 @@ body.mapMode{
    	height: 20px;
    	width: 75%;
 }
+
+/*-- Search buttons next to text inputs --*/
+  .filter.btn{
+  	height: 30px;
+  	padding: 0px;
+  	width: 35px;
+  }
+
+  .filter.btn > i:hover{
+  	color: #08c;
+  	transition: color .5s;
+  }
+  /*
 #filter-year{
 	width: 90%;
 }
 #filter-year input[type='text']{
 	max-width: 50px;
+}*/
+#filter-year .filter-input-contain{
+	margin-top: 10px;
+}
+/*-- The 'Year' filter elements --*/
+
+#filter-year > input[type="number"]{
+color: #115E95;
+background: none;
+border: 0px;
+text-align: right;
+min-height: 2em;
+-webkit-appearance: none;
+box-shadow: none;
+top: -5px;
+position: relative;
+margin-bottom: 0px;
+
+}
+
+#filter-year > input[type="number"]:focus{
+box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(82,168,236,0.6);
+}
+
+#max_year{
+float: right;
+margin-right: 3%;
+}
+
+#min_year{
+float: left;
+}
+
+  #year-range{
+min-height: 6px;
+border-radius: 4px;
+border: 0px;
+background: #AAAAAA;
+position: relative;
+margin-bottom: 5px;
+width: 85%;
+}
+
+#year-range.disabled,
+#min_year.disabled,
+#max_year.disabled{
+opacity: 0.6;
+}
+
+.ui-slider-range{
+top: 0;
+height: 100%;
+position: absolute;
+z-index: 1;
+display: block;
+border: 0;
+background-color: #006699;
+}
+
+.ui-slider-handle{
+border: 1px solid #999999;
+background-color: #EFEFEF;
+top: -0.4em;
+position: absolute;
+z-index: 2;
+width: 1em;
+height: 1em;
+cursor: default;
+border-radius: 1.2em;
+-moz-border-radius: 1.2em;
+-webkit-border-radius: 1.2em;
+}
+
+  #filter-year  input[type="number"]{
+  background: #FFF;
+border: 1px solid #ccc;
+text-align: right;
+min-height: 23px;
+-webkit-appearance: none;
+top: -5px;
+position: relative;
+margin-bottom: 0px;
+width: 56px;
+margin-top: 10px;
+margin-bottom: 10px;
+font-size: 14px;
+color: #555;
+line-height: 14px;
+padding: 2px;
 }
 #sidebar .ui-helper-hidden-accessible{
 	display: none;
-}
-#filter-year .filter-input-contain{
-	margin-top: 10px;
 }
 .filter-contain input[type="checkbox"].filter{
    width: 20px;
@@ -3581,6 +4445,41 @@ body.mapMode{
 }
 #results-container .pagination{
 	box-sizing: border-box;
+}
+/*-- Results rows --*/
+#results-container {
+ width: 75%;
+ width: calc(100% - 265px - 20px);
+ overflow-y: visible;
+ overflow-x: visible;
+ height: auto;
+ float: left;
+ margin-left: 20px;
+ background-color: rgba(255, 255, 255, 0.9);
+}
+.mapMode #results-container {
+ width: 40%;
+ width: calc((100% - 217px)/2);
+ overflow-x: hidden;
+ overflow-y: scroll;
+ -webkit-transform: translate3d(0,0,1);
+ height: 700px;
+ margin-left: 0px;
+}
+.list-only #results-container {
+   padding: 0px 20px;
+   margin-left: 0px;
+   width: calc(100% - 40px);
+}
+#map-container {
+ position: relative;
+ height: 500px;
+ width: 34%;
+ width: calc((100% - 217px)/2);
+ float: left;
+}
+.map-pointer{
+  display: none;
 }
 /*-- The filter checkboxes --*/
 #includes-files label{
@@ -4224,7 +5123,7 @@ Editor View
 	padding-bottom: 100px;
 }
 .Editor #Content {
-    padding-top: 70px;
+    padding-top: 0px;
     padding-left: 0px;
     padding-right: 0px;
     max-width: 100%;
@@ -4253,6 +5152,10 @@ Editor View
 }
 .side-nav-item.error a{
 	color: #da4e4e;
+}
+.side-nav-item .active {
+    background-color: #08c;
+    color: #FFF;
 }
 .side-nav-item.error .active {
     background-color: #da4e4e;
@@ -5226,12 +6129,6 @@ table.api tr td:nth-child(even) {
 	font-weight: lighter;
 }
 
-#slaask-input{
-	height: 100px;
-	word-break: break-word;
-}
-.slaask-widget-container{
-}
 /*******************************************
 CSS library fixes
 ******************************************/
@@ -5338,4 +6235,518 @@ CSS library fixes
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
   background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
   background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
+}
+
+/* -----  CSS FOR emlparser -----
+------------------------------------------------ */
+
+ *	  Color Scheme:
+ *    dark blue:                  #003366
+ *    aqua blue:                  #0066CC
+ *    aqua green:                 #006666
+ *    white:                      #FFFFFF
+ *    dark tan(kelp color):       #666600
+ *    light tan:                  #CCCC99
+ */
+
+
+#content_wrapper {
+	margin:                     0px 10px 10px 10px;
+}
+
+
+
+/* these classes to be children of div "content" */
+
+
+/* for the skip-to box */
+
+ div.skipto-box {
+      vertical-align:	  middle;
+      text-align:         center;
+      color:              #003366;
+      background-color:   #CCCC99;
+      /* turned off float, placed with a table cell */
+      /*float:              left; */
+      padding:            6px;
+      /* set border for NN4 only change in advanced.css */
+      border:             0.1px solid #006666;
+      margin:             8px;
+      /* width: 		  50%; */
+      width:              300px;
+     /* height:             20px; */
+      font-size:          12px;
+  }
+
+div.r-box {
+      vertical-align:     middle;
+      text-align:         center;
+      color:              #003366;
+      background-color:   #CCCC99;
+      float:              right;
+      padding:            6px 6px;
+      /* set border for NN4 only change in advanced.css */
+      border:             0.1px solid #006666;
+      margin:             0px;
+      width:              50%;
+   /*   height:             auto; */
+      font-size:          12px;
+   /*   clear:              both; */
+  }
+
+
+div.content-area {
+       /* for padding area within parent area */
+    background-color:   #FFFFFF;
+    color:              #003366;
+    text-align:         left;
+   padding:            30px 40px 15px 40px;
+   /*padding:            0px 0px 0px 0px; */
+
+}
+
+div.content-area-dense {
+       /* for padding area within parent area */
+    background-color:   #FFFFFF;
+    color:              #003366;
+    text-align:         left;
+  /*  padding:            30px 40px 15px 40px; */
+   padding:            0px 0px 0px 0px;
+
+}
+
+
+
+div.hanging-paragraph {
+	margin-left:	20px;
+	text-indent:	-20px;
+
+}
+
+div.smaller-font {
+    	font-size:		smaller;
+}
+
+div.bottom-padding {
+/*	padding:		0px 0px 10px 0px; */
+	padding-bottom:		10px;
+}
+
+div.left-padding {
+	padding-left:		10px;
+}
+
+#search-box {
+  /* background and text style set by table .group */
+  position:           relative;
+  margin-left:        50%;
+  /* top: 110px; */
+ }
+
+
+#search-box_right {
+    text-align:     right;
+    }
+
+#loginbox {
+    border:                     0px;
+    position:                   absolute;
+    top:                        55px;
+    right:                      65px;
+    }
+
+#footer {
+    position:                   absolute;
+    right:                      10px;
+    bottom:                     0;
+    left:                       167px;
+    margin:                     0px 10px 10px 177px;
+    }
+
+#debug {
+    position:                   absolute;
+    right:                      20px;
+    bottom:                     0;
+    left:                       167px;
+    margin:                     0px 10px 10px 177px;
+    }
+
+ul,ol {
+    padding:                    0px;
+    /* margin:                     0px 0px 0px 15px; */
+    }
+
+
+
+.ol-lower-alpha {
+    list-style-type: lower-alpha;
+    margin-top:       2px;
+
+  }
+
+
+.ul-bulleted-list {
+    list-style-type:  disc;
+    margin-top:       2px;
+    margin-bottom:    10px;
+    margin-left:      15px;
+  }
+
+
+
+/* to emphasize words, use it inline with a <span> class*/
+big {
+    font-size:                  larger;
+  }
+
+/* to shrink words, use it inline with a <span> class*/
+small {
+    font-size:                  smaller;
+  }
+
+/* New horizontal rule. Netscape 4.x should render this fine.
+ * apply this class to a <div> tag for the desired effect.
+ * the rule is 1px wide, blue with a slight margin on the left and right.
+ */
+.rule {
+    border-top-width:           2px;
+    border-top-style:           solid;
+    border-color:               #003366;
+    margin:                     4px 4px
+  }
+
+
+img.vtop {
+    vertical-align:             top;
+  }
+
+/* Add a blue border around an image */
+
+img.border {
+    border:                     medium;
+    border-style:               solid;
+    border-color:               #003366;
+    padding:                    0px;
+  }
+
+/* Format the headshot images in the who section */
+
+img.headshot {
+    margin-right:               20px;
+    margin-bottom:              40px;
+  }
+
+/* Format the headshot images in the who section
+ * that have alot of text aligned to the right */
+img.headshot_long {
+    margin-right:               20px;
+    margin-bottom:              80px;
+  }
+
+/* Format inline images justified to the left in the text*/
+
+img.inlineleft {
+    border:                     medium;
+    border-style:               solid;
+    border-color:               #003366;
+    margin-right:               8px;
+    margin-top:                 8px;
+    margin-bottom:              8px;
+  }
+
+/* Format inline images justified to the right in the text*/
+
+img.inlineright {
+    border:                     medium;
+    border-style:               solid;
+    border-color:               #003366;
+    margin-left:                8px;
+    margin-top:                 8px;
+    margin-bottom:              8px;
+  }
+
+
+/* Additions for the data catalog pages */
+
+/* Define a border for groups of elements.  This uses the
+   -moz-border-radius (Mozilla, Netscape, Opera only)
+   attribute for the time being.  Once
+   browsers support the CSS3 border-radius attribute, this
+   should be switched.*/
+.group {
+    padding:                    0;
+    color:                      #003366;
+    min-width:                  800px;
+    voice-family:               "\"}\""; /* begin ie5win hack */
+    voice-family:               inherit;
+    -moz-border-radius:         10px; /* end ie5win hack */
+    }
+/* Children of the group get some padding */
+.group * {
+    padding:                    2px;
+    }
+
+.group_border {
+    /* aqua-green border */
+    border:                     #006666 solid 1px;
+    }
+
+.subGroup {
+    padding:                    3px;
+    voice-family:               "\"}\""; /* begin ie5win hack */
+    voice-family:               inherit;
+    -moz-border-radius:         10px; /* end ie5win hack */
+    }
+
+
+/* This selector causes the 'section' tables to indent under the overarching div
+ * tags */
+div>table.subGroup {
+    padding-left:               15px;
+    padding-right:              15px;
+    }
+
+div.left {
+    position:                   absolute;
+    left:                       20px;
+    clear:                      right;
+    }
+
+div.right {
+    position:                   absolute;
+    right:                      20px;
+    clear:                      left;
+    }
+
+table.left {
+    position:                   absolute;
+    left:                       20px;
+    }
+
+table.right {
+    float:                      right;
+    margin-right:               10px;
+    clear:                      left;
+    }
+
+th {
+    color:                      #555555;
+    padding:                    0;
+    margin:                     0;
+    text-align:                 left;
+    font-style:                 normal;
+    font-weight:                700;
+}
+
+th.rowheader {
+    background:                 #f1f8f8;
+    border-right:               #94c1d4 solid 1px;
+    }
+
+.coleven {
+    border-left:                #94c1d4 dotted 1px;
+    border-right:               #94c1d4 dotted 1px;
+    background-color:           #f1f8f8;
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align: left;
+}
+
+.colodd {
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}
+
+.innercolodd {
+    border:                     solid #94c1d4 1px;
+    font-size:                  .75em;
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}
+
+.innercoleven {
+    border:                     solid #94c1d4 1px;
+    background-color:           #f1f8f8;
+    font-size:                  .75em;
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}
+
+.onehundred_percent {
+    width:                      100%;
+    }
+
+.eighty_percent {
+    width:                      80%;
+    }
+
+
+.seventyfive_percent {
+    width:                      75%;
+    }
+
+.seventy_percent {
+    width:                      70%;
+    }
+
+.fifty_percent {
+    width:                      50%;
+    }
+
+.fortyfive_percent {
+    width:                      45%;
+    }
+
+.forty_percent {
+    width:                      40%;
+    }
+
+.twentyfive_percent {
+    width:                      25%;
+    }
+
+
+.twenty_percent {
+    width:                      20%;
+    }
+
+
+.fifteen_percent {
+    width:                      15%;
+    }
+
+input.view.data-button{
+ /*  color:		#666600; */
+   font-size:		1.25em;
+ /*  font-weight:		bold; */
+   text-decoration:		underline;
+   background:		#ffffff;
+
+}
+
+/***
+iframe classes
+****/
+.iframeheaderclass {
+    height:   85px;
+    width:    100%;
+    border:   0px;
+    /*margin-bottom:   10px;*/
+    margin: 10px;
+}
+
+.iframesearchboxclass {
+    height:   450px;
+    width:    100%;
+    border:   0px;
+    margin:   0px;
+}
+
+.iframeadvancedsearchboxclass {
+    height:   1250px;
+    width:    100%;
+    border:   0px;
+    margin:   0px;
+}
+
+.iframemapclass {
+    height:   570px;
+    width:    100%;
+    border:   0px;
+    margin:   0px;
+}
+
+.iframeloginboxclass {
+    height:   305px;
+    width:    100%;
+    border:   0px;
+    margin:   0px;
+}
+
+.iframeleftcolclass  { /* not used */ }
+.iframerightcolclass { /* not used */ }
+.iframefooterclass   { /* not used */ }
+
+/**
+ *  set the size and alignment etc of the top-level layout table
+ */
+.templatetableclass {
+    width:   100%;
+    border:   0px;
+    padding:  0px;
+    margin:   0px;
+}
+
+/**
+ *  set the style of the main content area and its contents
+ */
+.templatecontentareaclass {
+    border:   0px;
+    padding:  0px;
+    margin:   0px;
+}
+
+/**
+ *  set the correct <td> sizes to accomodate the
+ *  header, footer, left and right iframes.
+ *  NOTE: these styles apply only to each
+ *  container frame, *NOT* to the document in
+ *  the iframe within it!
+ */
+.templateheaderrowclass {
+    height:   80px;
+    /*
+      no width allowed - uses same width as table class
+    */
+    border:   0px;
+    padding:  0px;
+    margin:   0px;
+}
+
+.templateleftcolclass {
+    height:   100%;
+    width:    0px;
+    border:   0px;
+    padding:  0px;
+    margin:   0px;
+}
+
+.templaterightcolclass {
+    height:   100%;
+    width:    0px;
+    border:   0px;
+    padding:  0px;
+    margin:   0px;
+}
+
+.templatefooterrowclass {
+    height:   0px;
+    /*
+      no width allowed - uses same width as
+      table class
+    */
+    border:   0px;
+    padding:  0px;
+    margin:   0px;
+}
+
+.searchresultsdivider {
+	height:	10px;
+}
+.highlight {
+    border-bottom:              #94c1d4 dotted 1px;
+    border-top:                 #94c1d4 dotted 1px;
+    background-color:           #f1f8f8;
+    padding:                    0;
+    margin:                     0;
+}
+.tablehead {
+    text-align:                 left;
+    font-style:                 normal;
+    font-weight:                700;
+    padding-top: 10px;
+    font-size: 1.1em;
 }
