@@ -77,8 +77,16 @@ define(['jquery', 'underscore', 'backbone'],
 			tokenUrl: null,
             mdqBaseUrl: "https://docker-ucsb-1.dataone.org:30443/quality",
             // suidIds and suiteLables must be specified as a list, even if only one suite is available.
-            suiteIds: ["dataone.suite.1"],
-            suiteLabels: ["DataONE Metadata Completeness Suite v1.0"],
+            // FAIR suite is not implemented yet, this is just a placeholder
+            suiteIds: ["FAIR.suite.1"],
+            mdqFormatIds:["eml*", "*datadryad*", "*isotc211*"],
+            suiteLabels: ["DataONE FAIR Metadata Suite v1.0"],
+            // When running on cn and route is for 'profile' view with user as node name, have 
+            // to select the appropriate suite and formatIds for the correct MN
+            mdqformatIdsByNode:{"ARCTIC": ["eml*"]}, 
+            suiteIdsByNode:{"ARCTIC": "arctic.data.center.suite.1"},
+            suiteLabelsByNode: {"ARCTIC": "Arctic Data Center Metadata Suite v1.0"},
+            mdqQueryServiceUrl: "https://docker-ucsb-1.dataone.org:8983/solr/quality",
 			// Metrics endpoint url
 			metricsUrl: 'https://logproc-stage-ucsb-1.test.dataone.org/metrics',
 

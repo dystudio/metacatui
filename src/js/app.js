@@ -59,6 +59,7 @@ require.config({
 	d3: MetacatUI.d3URL,
 	LineChart: ['views/LineChartView', null],
 	BarChart: ['views/BarChartView', null],
+	BoxPlot: ['views/BoxPlotView', null],
 	CircleBadge: ['views/CircleBadgeView', null],
 	DonutChart: ['views/DonutChartView', null],
 	MetricsChart: ['views/MetricsChartView', null],

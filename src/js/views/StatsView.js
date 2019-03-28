@@ -1,6 +1,6 @@
 /*global define */
-define(['jquery', 'underscore', 'backbone', 'd3', 'LineChart', 'BarChart', 'DonutChart', 'CircleBadge', 'collections/Citations', 'models/MetricsModel', 'views/MetricsChartView', 'text!templates/metricModalTemplate.html', 'views/CitationListView', 'text!templates/profile.html', 'text!templates/alert.html', 'text!templates/loading.html'], 				
-	function($, _, Backbone, d3, LineChart, BarChart, DonutChart, CircleBadge, Citations, MetricsModel, MetricsChart, MetricModalTemplate, CitationList, profileTemplate, AlertTemplate, LoadingTemplate) {
+define(['jquery', 'underscore', 'backbone', 'd3', 'LineChart', 'BarChart', 'BoxPlot', 'DonutChart', 'CircleBadge', 'collections/Citations', 'models/MetricsModel', 'views/MetricsChartView', 'text!templates/metricModalTemplate.html', 'views/CitationListView', 'text!templates/profile.html', 'text!templates/alert.html', 'text!templates/loading.html'], 				
+	function($, _, Backbone, d3, LineChart, BarChart, BoxPlot, DonutChart, CircleBadge, Citations, MetricsModel, MetricsChart, MetricModalTemplate, CitationList, profileTemplate, AlertTemplate, LoadingTemplate) {
 	'use strict';
 			
 	var StatsView = Backbone.View.extend({
@@ -62,16 +62,13 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'LineChart', 'BarChart', 'Donu
 				this.listenTo(MetacatUI.statsModel, 'change:metadataCount', 	    this.drawTotalCount);			
 				this.listenTo(MetacatUI.statsModel, 'change:dataFormatIDs', 	  this.drawDataCountChart);
 				this.listenTo(MetacatUI.statsModel, 'change:metadataFormatIDs', this.drawMetadataCountChart);
+				this.listenTo(MetacatUI.statsModel, 'change:mdqStats', this.drawMdqChart);
 
 				//this.listenTo(MetacatUI.statsModel, 'change:dataUploads', 	  this.drawUploadTitle);
 			}
 			
 			this.listenTo(MetacatUI.statsModel, 'change:downloads', 	  this.drawDownloadTitle);
 			this.listenTo(MetacatUI.statsModel, 'change:lastEndDate',	  	  this.drawCoverageChartTitle);
-			
-			// mdq
-			this.listenTo(MetacatUI.statsModel, 'change:mdqStats',	  	  this.drawMdqStats);
-			
 			this.listenTo(MetacatUI.statsModel, "change:totalCount", this.showNoActivity);
 
 			// set the header type
@@ -742,116 +739,33 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'LineChart', 'BarChart', 'Donu
 			this.$('#data-coverage-year-range').text(yearRange);
 		},
 		
-		drawMdqStats: function() {
-			if (!MetacatUI.statsModel.get("mdqStats")) {
-				return;
-			}
-			if (!MetacatUI.statsModel.get("mdqStatsTotal")) {
-				return;
-			}
-			var mdqCompositeStats= MetacatUI.statsModel.get("mdqStats").mdq_composite_d;
-			
-			var mdqTotalStats = MetacatUI.statsModel.get("mdqStatsTotal").mdq_composite_d;
-			
-			if (mdqTotalStats && mdqTotalStats.mean && mdqCompositeStats && mdqCompositeStats.mean) {
-				var diff = mdqCompositeStats.mean - mdqTotalStats.mean;
-				var repoAvg = (mdqTotalStats.mean*100).toFixed(0) + "%";
-				
-				if (diff < 0) {
-					$("#mdq-percentile-container").text("Below repository average");
-					$("#mdq-percentile-icon").addClass("icon-thumbs-down");
-				}
-				if (diff > 0) {
-					$("#mdq-percentile-container").text("Above repository average");
-					$("#mdq-percentile-icon").addClass("icon-thumbs-up");
-				}
-				if (diff == 0) {
-					$("#mdq-percentile-container").text("At repository average");
-					$("#mdq-percentile-icon").addClass("icon-star");
-				}
-				
-				// for the box plot
-				// top arrow for this view
-				$("#mdq-score-num").text((mdqCompositeStats.mean*100).toFixed(0) + "%");
-				$("#mdq-score").css(
-				{
-					  "margin-left": (mdqCompositeStats.mean*100).toFixed(0) + "%"
-				});
-				// the range
-				$("#mdq-box").css(
-				{
-					"width": ((mdqCompositeStats.max - mdqCompositeStats.min) * 100).toFixed(0) + "%",
-					"margin-left": (mdqCompositeStats.min*100).toFixed(0) + "%"
-				});
-				$("#mdq-box").attr("data-content", mdqCompositeStats.count + " scores range from " + (mdqCompositeStats.min*100).toFixed(0) + "%" + " to " + (mdqCompositeStats.max*100).toFixed(0) + "%");
-				// the bottom arrow for repo
-				$("#mdq-repo-score-num").text((mdqTotalStats.mean*100).toFixed(0) + "%");
-				$("#mdq-repo-score").css(
-				{
-					  "margin-left": (mdqTotalStats.mean*100).toFixed(0) + "%"
-				});
-	
-			}
-			
-			// now draw the chart
-			this.drawMdqFacets();
-
-		},
-		
-		drawMdqFacets: function() {
-			
-			var mdqCompositeStats= MetacatUI.statsModel.get("mdqStats").mdq_composite_d;
-			
-			if (mdqCompositeStats) {
-				// keys are the facet values, values are the stats (min, max, mean, etc...)
-				var datasourceFacets = mdqCompositeStats.facets.mdq_metadata_datasource_s || {};
-				var formatIdFacets = mdqCompositeStats.facets.mdq_metadata_formatId_s || {};
-				var rightsHolderFacets = mdqCompositeStats.facets.mdq_metadata_rightsHolder_s || {};
-				var suiteIdFacets = mdqCompositeStats.facets.mdq_suiteId_s || {};
-				var funderFacets = mdqCompositeStats.facets.mdq_metadata_funder_sm || {};
-				var groupFacets = mdqCompositeStats.facets.mdq_metadata_group_sm || {};
-							
-				if(!Object.keys(datasourceFacets).length && 
-						!Object.keys(formatIdFacets).length &&
-						!Object.keys(rightsHolderFacets).length &&
-						!Object.keys(suiteIdFacets).length &&
-						!Object.keys(funderFacets).length &&
-						!Object.keys(groupFacets).length)
-					return;
-					
-				//this.drawMdqChart(datasourceFacets);
-				//this.drawMdqChart(rightsHolderFacets);
-				this.drawMdqChart(_.extend(formatIdFacets, datasourceFacets, suiteIdFacets, funderFacets, groupFacets));
-
-				//Unhide the quality chart
-				$("#quality-chart").show();
-			}
-		},
-		
 		//Draw a bar chart for the slice
-		drawMdqChart: function(data){
+        drawMdqChart: function(){
 			
 			//Get the width of the chart by using the parent container width
-			var parentEl = this.$('.mdq-chart');
-			var width = parentEl.width() || null;			
+			var parentEl = this.$('.quality-chart');
+			var width = parentEl.width() - this.$('.chart-title')|| null;			
+            
+            var data = MetacatUI.statsModel.get('mdqStats');
+            // Just for RDA demo, display aggregated quality for ARCTIC only
+            ///MetacatUI.appModel.get("profileUsername") != "ARCTIC") {
+            if (this.userType != "node" || data === null || typeof data == "undefined" || data.length == 0) {
+                parentEl.hide();
+                return;
+            }
 			
 			var options = {
 					data: data,
-					formatFromSolrFacets: true,
-					solrFacetField: "mean",
-					id: "mdq-slice-chart",
-					yLabel: "mean score",
+                    id: "mdq-chart",
+                    yLabel: "Quality Score (percentage)",
 					yFormat: d3.format(",%"),
-					barClass: "packages",
-					roundedRect: true,
-					roundedRadius: 10,
-					barLabelClass: "packages",
+                    barClass: "quality",
+                    barLabelClass: "quality scores",
 					width: width
 				};
 			
-			var barChart = new BarChart(options);
-			parentEl.html(barChart.render().el);
-			
+            var boxPlot = new BoxPlot(options);
+            this.$('.mdq-chart').html(boxPlot.render().el);
 		},
 		
 		/*

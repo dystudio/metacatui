@@ -41,7 +41,35 @@ define(['jquery', 'underscore', 'backbone', 'models/LogsSearch'],
 			// complex objects like this
 			// {mdq_composite_d: {"min":0.25,"max":1.0,"count":11,"missing":0,"sum":6.682560903149138,"sumOfSquares":4.8545478685001076,"mean":0.6075055366499217,"stddev":0.2819317507548068}}
 			mdqStats: {},
-			mdqStatsTotal: {},
+            
+            analyticsQuery: {"groupings" : {  
+                    "scores" : {
+                        "expressions" : {
+                            "min_score" : "min(scoreOverall)",
+                            "pctl_25"   : "percentile(25.0, scoreOverall)",
+                            "median"    : "median(scoreOverall)",
+                            "pctl_75"   : "percentile(75.0, scoreOverall)",
+                            "max_score" : "max(scoreOverall)",
+                            "count"     : "count(scoreOverall)"
+                          },
+                          "facets" : {
+                              "scoresByDateRange" : {
+                               "type" : "range",
+                                "field" : "dateUploaded",
+                                "start" : "2016-01-01T00:00:00.000Z",
+                                "end" : "2020-01-01T00:00:00.000Z",
+                                "gaps" : [ "+1YEAR" ],
+                                "hardend" : true,
+                                "include" : [
+                                    "lower",
+                                    "upper"
+                                ],
+                                "others" : [ "none" ]
+                            }
+                        }
+                    }
+                }
+            },
 
 			supportDownloads: (MetacatUI.appModel.get("nodeId") && MetacatUI.appModel.get("d1LogServiceUrl"))
 		},
@@ -108,7 +136,7 @@ define(['jquery', 'underscore', 'backbone', 'models/LogsSearch'],
 
 			this.getDownloadDates();
 
-			this.getMdqStatsTotal();
+			this.getMdqStats();
 			//this.getDataDownloadDates();
 			//this.getMetadataDownloadDates();
 		},
@@ -917,89 +945,149 @@ define(['jquery', 'underscore', 'backbone', 'models/LogsSearch'],
 		** getMdqStats will query SOLR for MDQ stats and will update the model accordingly
 		**/
 		getMdqStats: function(){
-			var model = this;
+            // If the metadata quality Solr server is not defined, exit
+            if(!MetacatUI.appModel.get("mdqQueryServiceUrl")){
+                return;
+            }
+            
+            var userType = null;
+            var userName = null;
+            if(MetacatUI.appView.userView) {
+                userType = MetacatUI.appView.userView.model.get("type");
+                userName = MetacatUI.appView.userView.model.get("username");
+            }
+            
+            var suiteId;
+            var nodeType;
+            var query;
+            // Check if this is a profile for a node, running on the CN
+            if(userType != null && userType == 'node'){
+                // Running profile view on CN, retrieve stats for the
+                // node that was entered as a route 
+                var suites = MetacatUI.appModel.get("suiteIdsByNode");
+                suiteId = suites[userName];
+                nodeId = 'urn:node:' + userName;
+                nodeType = 'mn'
+                query = MetacatUI.appModel.get('mdqQueryServiceUrl') + '/select?q=suiteId:%22' + suiteId + '%22' +'datasource:%22' + nodeId + '%22';
+            } else {
+                // TODO: check if this is a regular user or group
+                // If not a user, then we are querying for the entine MN or CN
+                // If we are querying from a CN, then don't include the 'datasource' as we want info for the entire network.
+                suiteId = MetacatUI.appModel.get("suiteIds")[0];
+                var nodeId = MetacatUI.nodeModel.get("currentMemberNode");
+                var thisNode = MetacatUI.nodeModel.isCN(nodeId);
+                var nodeType = 'mn';
+                if(thisNode) {
+                    nodeType=thisNode.type
+                }
+                if(nodeType === 'cn') {
+                    var query = MetacatUI.appModel.get('mdqQueryServiceUrl') + '/select?q=suiteId:%22' + suiteId + '%22';
+                } else  {
+                    var query = MetacatUI.appModel.get('mdqQueryServiceUrl') + '/select?q=suiteId:%22' + suiteId + '%22' +'datasource:%22' + nodeId + '%22';
+                }
+            }
+            
+            // The suite was not determined, so trigger the drawing of the view anyway
+            // and let the view decide what to do.
+            if (typeof suiteId == "undefined") {
+                this.set("mdqStats", null);
+                return;
+            }
 
+			var model = this;
+            var analyticsQuery = model.get("analyticsQuery");
+            //analyticsQuery.groupings.scores.facets.scoresByDateRange.start = this.firstPossibleUpload;
+            analyticsQuery.groupings.scores.facets.scoresByDateRange.start = "2012-01-01T00:00:00Z",
+            analyticsQuery.groupings.scores.facets.scoresByDateRange.end = 'NOW';
+            
 			//Build the query to get the MDQ stats
-			var query = this.get('query') +
-						"+formatId:%22https:%2F%2Fnceas.ucsb.edu%2Fmdqe%2Fv1%23run%22+-obsoletedBy:*";
-			var otherParams = "&rows=0" +
-						 	  "&stats=true" +
-						 	  // fields
-							  "&stats.field=mdq_composite_d" +
-							  "&stats.field=mdq_discovery_d" +
-							  "&stats.field=mdq_interpretation_d" +
-							  "&stats.field=mdq_identification_d" +
-							  // facets
-							  "&stats.facet=mdq_metadata_formatId_s" +
-							  "&stats.facet=mdq_metadata_rightsHolder_s" +
-							  "&stats.facet=mdq_metadata_datasource_s" +
-							//  "&stats.facet=mdq_metadata_funder_sm" +
-							// "&stats.facet=mdq_metadata_group_sm" +
-							  "&stats.facet=mdq_suiteId_s" +
-							  //"&sort=mdq_metadata_formatId_s%20desc" +
-							  "&wt=json";
+
+			var otherParams = "&rows=0" + "&wt=json" + "&q.op=AND";
+            console.debug("mdq query: " + query + otherParams);
 
 			//Run the query for stats
 			var requestSettings = {
-				url: MetacatUI.appModel.get('queryServiceUrl') + "q=" + query + otherParams,
-				type: "GET",
-				dataType: "json",
+				url: query + otherParams,
+				type: "POST",
+                data: {"analytics" : JSON.stringify(analyticsQuery)},
+                xhrFields: { withCredentials: false },
 				success: function(data, textStatus, xhr) {
-
-					var mdqStats = data.stats.stats_fields;
-
+                    var result = JSON.parse(data);
+                    var mdqStats = model.processMdqStats(result.analytics_response.groupings);
 					// Set the pertinent information in the model
 					model.set('mdqStats', mdqStats);
-
+				},
+                error: function (what, jqXhr, options) {
+                  console.debug("error fetching Solr analytics report.");
 				}
 			};
 
-			$.ajax(_.extend(requestSettings, MetacatUI.appUserModel.createAjaxSettings()));
+			$.ajax(requestSettings);
 		},
 
 		/**
-		** getMdqStatsTotal will query SOLR for ALL MDQ stats and will update the model accordingly
+        ** Convert the Solr Analytics result set to a format more easily used by display functions.
 		**/
-		getMdqStatsTotal: function(){
-			var model = this;
-
-			//Build the query to get ALL MDQ stats - not filtered!
-			var query =  "formatId:%22https:%2F%2Fnceas.ucsb.edu%2Fmdqe%2Fv1%23run%22+-obsoletedBy:*";
-			var otherParams = "&rows=0" +
-						 	  "&stats=true" +
-						 	  // fields
-							  "&stats.field=mdq_composite_d" +
-							  "&stats.field=mdq_discovery_d" +
-							  "&stats.field=mdq_interpretation_d" +
-							  "&stats.field=mdq_identification_d" +
-							  // facets
-							  //"&stats.facet=mdq_metadata_formatId_s" +
-							  //"&stats.facet=mdq_metadata_rightsHolder_s" +
-							  //"&stats.facet=mdq_metadata_datasource_s" +
-							  //"&stats.facet=mdq_suiteId_s" +
-							  //"&sort=mdq_metadata_formatId_s%20desc" +
-							  "&wt=json";
-
-			//Run the query for stats
-			var requestSettings = {
-				url: MetacatUI.appModel.get('queryServiceUrl') + "q=" + query + otherParams,
-				type: "GET",
-				dataType: "json",
-				success: function(data, textStatus, xhr) {
-
-					var mdqStatsTotal = data.stats.stats_fields;
-
-					// Set total in the model
-					model.set('mdqStatsTotal', mdqStatsTotal);
-
-					// get the specific stats which will trigger rendering
-					model.getMdqStats();
-
-				}
+        processMdqStats: function(stats) {
+            
+            var firstDataPeriod;
+            
+            var allScores = stats.scores.scoresByDateRange;
+            var filteredResults = [];
+            // Transform result set to an array of lines such as
+            //     ["startdate", "enddate", count (for this facet), min score, max score, 25th percentile, median score, 75th percentile]
+            // for example:
+            //     ["2018-01-01T00:00:00Z", "2019-01-01T00:00:00Z", 63, 0.71428573, 1, 0.85714287, 0.8999999761581421, 0.95238096]
+            var results = _.map(allScores, function(score) {
+                var datesStr = score.value.replace('[', '').replace(']', '')
+                var dates = datesStr.split(' TO ');
+                // TODO: use regex for label
+                if(score.results.count == 0) {
+                    return({label: dates[0].substring(0,4),
+                        startDate: dates[0], 
+                        endDate: dates[1], 
+                        count: score.results.count, 
+                        min: 0, 
+                        max: 0, 
+                        pct25: 0, 
+                        median: 0, 
+                        pct75: 0});
 			};
-
-			$.ajax(_.extend(requestSettings, MetacatUI.appUserModel.createAjaxSettings()));
+                // Convert all values to percentages
+                // TODO: use regex to extract label
+                return({label: dates[0].substring(0,4),
+                    startDate: dates[0],
+                    endDate: dates[1],
+                    count: score.results.count,
+                    min: score.results.min_score * 100.0,
+                    max: score.results.max_score * 100.0,
+                    pct25: score.results.pctl_25 * 100.0,
+                    median: score.results.median * 100.0,
+                    pct75: score.results.pctl_75 * 100.0});
+            }, this);
+            
+            // TODO: update the filtering to only filter leading and trailing zero count entries
+            var foundStart = false;
+            filteredResults = _.filter(results, function(score) {
+                // Skip over initial enties with a count of 0, so that we find the first
+                // date range when data was actually uploaded. Once we have found the first 
+                // time period of data, show all groupings after that.
+                if (score.count == 0) {
+                    // Return true unless wh are past the start of data
+                    if(foundStart) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    if (!foundStart) foundStart = true;
+                    return true
+                }
+            });
+            
+            return filteredResults;
 		}
 	});
+    
 	return Stats;
 });
