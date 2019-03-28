@@ -41,7 +41,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'LineChart', 'BarChart', 'BoxP
 				this.listenTo(this.metricsModel, "sync" , this.renderMetrics);
 			}
 
-			if (this.userType == "node" || this.userType == "person") {
+			if (this.userType == "node" || this.userType == "person" || this.userType == "user") {
 				if(this.metricsModel.get("totalViews") !== null) {
 					this.renderMetrics();
 				}
@@ -170,8 +170,9 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'LineChart', 'BarChart', 'BoxP
             var metricMonths        = MetacatUI.appView.currentView.metricsModel.get("months");
             var metricCount 		= MetacatUI.appView.currentView.metricsModel.get(metricNameLemma);
             var width               = document.getElementById('user-'+metricNameLemma+'-chart' ).offsetWidth;
+            var viewType                = this.userType;
 
-            if (width < 0) {
+            if (width == null || width < 0) {
                 width = 600;
             }
 
@@ -180,6 +181,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'LineChart', 'BarChart', 'BoxP
                             id: metricNameLemma + "-chart",
                             metricCount: metricCount,
                             metricMonths: metricMonths,
+                            type: viewType,
                             metricName: metricName,
                             width: width
                         });
