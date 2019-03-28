@@ -1,8 +1,0 @@
-{
-    "themeName": "default",
-    "themeTitle":"Metacat Data Catalog",
-    "moduleMap": {
-        "*": {
-        }
-    }
-}
