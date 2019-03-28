@@ -66,7 +66,7 @@ define(['jquery', 'underscore', 'backbone', 'd3'],
             // TODO: calculate this based on # of bars in chart
             var barWidth = 30;
 	
-			var margin = {top: 20, right: 15, bottom: 65, left: 20},
+			var margin = {top: 20, right: 15, bottom: 65, left: 55},
 		    	viewWidth = this.width - (margin.left + margin.right),
 		    	viewHeight = this.height - (margin.top + margin.bottom);
 			
@@ -112,37 +112,22 @@ define(['jquery', 'underscore', 'backbone', 'd3'],
                     .innerTickSize(["-" + viewWidth + this.margin.right])
                     //.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
                     
-                    // Start: temp guide rects
-                    // -------------------------------
-                    // -------------------------------
-                    // var newg = svg.append("g");
-                    // // Draw the boxes of the box plot, filled in white and on top of vertical lines
-                    // var newRect2 = newg.append("rect")
-                    //   .attr("x", 0)
-                    //   .attr("y", 0)
-                    //   .attr("width", this.width) 
-                    //   .attr("height", this.height)
-                    //   // TODO use CSS to set color
-                    //   .attr("fill", "#c1ff8e");
-                    // 
-                    // // Draw the boxes of the box plot, filled in white and on top of vertical lines
-                    // var newRect= newg.append("rect")
-                    //   .attr("x", this.margin.left)
-                    //   .attr("y", this.margin.top)
-                    //   .attr("width", this.width - (this.margin.left + this.margin.right))
-                    //   .attr("height", this.height - (this.margin.top + this.margin.bottom))
-                    //   // TODO use CSS to set color
-                    //   .attr("fill", "#f9ff8e");
-                      
-                      // End: temp guide rects 
-                      // -------------------------------
-                      // -------------------------------
-
-                      
                 svg.append("g")
                 .attr("class", "y axis")
                 .attr("transform", "translate(" + this.margin.left + ",0)") 
                 .call(yAxis);
+                /*
+                  * ========================================================================
+                  * Draw the y-axis title
+                  * ========================================================================
+                */
+                svg.append("text")
+                    .attr("y", 6)
+                    .attr("dy", ".71em")
+                    .style("text-anchor", "middle")
+                    .text(this.yLabel)
+                    .attr("class", "title")
+                    .attr("transform", "translate(-5, " + (this.height/2) + ") rotate(-90)");
 
                 //.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
