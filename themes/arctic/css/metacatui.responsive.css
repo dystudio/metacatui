@@ -50,9 +50,6 @@
   		font-size: .9em;
   		max-width: 130px;
   	}
-  	#nav-trigger{
-  		display: none;
-  	}
   	.dropdown-menu{
   		position: absolute;
   	}
@@ -174,10 +171,6 @@
   		margin-left: 25%;
   	}
 
-  	 #nav-trigger{
-  		display: block;
-  	}
-
   	/* Take nav out of mobile-style */
 	nav{
 		float: right;
@@ -187,4 +180,8 @@
 	.nav li a{
 		text-align: left;
 	}
+
+  #nav-trigger{
+    color: #323D90;
+  }
 }

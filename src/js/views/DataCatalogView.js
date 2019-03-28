@@ -539,6 +539,12 @@ define(["jquery",
                     }
                 });
 
+                //If the Navbar is in a fixed position and doesn't have the auto-height-member class,
+                //  count it's height during this calculation.
+                if( $("#Navbar").css("position") == "fixed" && !$("#Navbar").is(".auto-height-member") ){
+                  otherHeight += $("#Navbar").outerHeight(true);
+                }
+
                 // Get the remaining height left based on the window size
                 var remainingHeight = $(window).outerHeight(true) - otherHeight;
                 if (remainingHeight < 0) remainingHeight = $(window).outerHeight(true) || 300;

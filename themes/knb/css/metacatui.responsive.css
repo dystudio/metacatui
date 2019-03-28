@@ -6,44 +6,79 @@
       left: 50%;
       margin: 0px 0px 0px -380px;
       z-index: 1;
-      float: none;      
+      float: none;
     }
-    
+
     #Header {
 	    height: 95px;
 	    background-color: transparent;
 	    background-image: none;
 	    overflow: hidden;
-	    opacity: 1.0;   
+	    opacity: 1.0;
   	}
+}
+
+/* All mobile devices */
+@media only screen and (max-width : 768px){
+  /************** General Structure ****************/
+  #Header{
+    display: none;
+  }
+  #Navbar{
+    width: 100%;
+  }
+  #Navbar > .navbar{
+    margin: 0px;
+  }
+  #Navbar .navbar-inner{
+    border-bottom: 2px solid #992222;
+  }
+  #Content{
+    padding-bottom: 785px; /* Keeps footer down */
+    margin-top: 0px;
+  }
+
+  /************** Footer ****************/
+  #Footer{
+    height: 775px; /* Keeps footer down */
+  }
+  footer div.help-items,
+  footer .logos{
+    width: 100%;
+    min-width: 100%;
+    margin-top: 20px;
+  }
+  footer .logos .logo{
+    margin-bottom: 0px;
+    margin-top: 0px;
+  }
+
+  /***** Navigation ****/
+  #nav-trigger{
+    color: #992222;
+    float: right;
+    margin-right: 10px;
+  }
+  #nav-trigger .close{
+    font-size: 1em;
+    color: #992222;
+  }
+  .navbar .brand{
+    font-size: 3em;
+    margin-left: 5px;
+  }
+  .navbar .nav .brand{
+    display: none;
+  }
+  #Navbar .nav{
+    background-color: transparent;
+  }
+  .mapMode #Content{
+    margin-top: 50px;
+  }
 }
 
 /* Smartphones (portrait and landscape) ----------- */
 @media only screen and (max-width : 480px) {
-	/************** General Structure ****************/
-	#Header{
-		display: none;
-	}
-	#Navbar .navbar-inner{
-		border-bottom: 2px solid #992222;
-	}
-	#Content{
-		padding-bottom: 785px; /* Keeps footer down */
-		margin-top: 0px;
-	}
-	
-	/************** Footer ****************/
-	#Footer{
-		height: 775px; /* Keeps footer down */
-	}
-	footer div.help-items,
-	footer .logos{
-		width: 100%;
-		min-width: 100%;
-		margin-top: 20px;
-	}
-	footer .logos .logo{
-		margin-bottom: 0px;
-		margin-top: 0px;
-	}
+
 }

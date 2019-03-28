@@ -423,15 +423,17 @@ width: calc(100% - 60px);
 
     .navbar .nav > li > a.brand {
       font-size: 48px;
-      font-weight: 300;
-      font-family: "Lato", Helvetica, sans-serif;
-      color: #992222;
-      letter-spacing: -3px;
       padding: 10px;
-      text-transform: none;
     }
     .navbar .nav > li > a.brand:hover{
       font-weight: 300;
+    }
+    #Navbar .navbar .brand{
+      font-family: "Lato", Helvetica, sans-serif;
+      color: #992222;
+      font-weight: 300;
+      text-transform: none;
+      letter-spacing: -3px;
     }
 
     .navbar .nav > li > a {

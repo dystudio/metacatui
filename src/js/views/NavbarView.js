@@ -19,7 +19,8 @@ define(['jquery', 'underscore', 'backbone', 'views/SignInView', 'text!templates/
 			 		 	    'click .dropdown' : 'hideDropdown',
 			 		 	'mouseover .dropdown' : 'showDropdown',
 			 		 	 'mouseout .dropdown' : 'hideDropdown',
-			 		 	'click #nav-trigger'  : 'showNav',
+            'click #nav-trigger .open' : "showNav",
+            'click #nav-trigger .close' : "hideNav",
 			 		 		  'click .nav li' : 'showSubNav'
 		},
 
@@ -129,13 +130,33 @@ define(['jquery', 'underscore', 'backbone', 'views/SignInView', 'text!templates/
 		showNav: function(){
 			this.$("nav").slideToggle();
 			this.$("#nav-trigger .icon").toggle();
+
+      //Don't listen to window resizes in order to show the nav
+      $(window).off("resize", this.showNonMobileNav);
 		},
+
+    hideNav: function(){
+      this.$("nav").slideToggle();
+			this.$("#nav-trigger .icon").toggle();
+
+      //Listen to window size changes
+      $(window).on("resize", this.showNonMobileNav);
+    },
+
+    showNonMobileNav: function(){
+
+      //If the window is larger than a mobile device, show the navigation
+      if( $(window).width() > 768 ){
+        this.$("nav").show();
+      }
+
+    },
 
 		showSubNav: function(e){
 			var parentEl = e.target.tagName == "LI"? e.target : $(e.target).parent("li");
 			if(!parentEl || !$(parentEl).length) return;
 
-			$(parentEl).find(".sub-menu").slideToggle();
+			$(parentEl).find("ul,nav,.nav").slideToggle();
 		},
 
 		triggerOnEnter: function(e) {
