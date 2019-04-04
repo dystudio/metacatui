@@ -7,6 +7,30 @@
     </head>
     <body>
         <div id="mocha"></div>
-        <script type="text/javascript" data-main="js/specs/runner.spec" src="../src/components/require.js"></script>
+
+      <script type="text/javascript">
+
+        var MetacatUI = {};
+
+        //Load the app entrypoint via RequireJS
+        MetacatUI.startApp = function() {
+          var script = document.createElement("script");
+          script.setAttribute("type", "text/javascript");
+          script.setAttribute("id", "entrypoint");
+          script.setAttribute("data-main", "js/specs/runner.spec");
+          script.setAttribute("src", "../src/components/require.js");
+          document.getElementsByTagName("body")[0].appendChild(script);
+        }
+
+        //Set the root on the MetacatUI global object
+        MetacatUI.root = "";
+        //There is no config file in the test suite, so set it to an empty object
+        MetacatUI.config = {};
+
+        //Start the app
+        MetacatUI.startApp();
+
+      </script>
+
     </body>
 </html>

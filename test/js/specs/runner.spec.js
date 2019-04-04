@@ -39,6 +39,13 @@ require.config({
         }
     }
 });
+require(['../src/js/models/AppModel'],
+function(AppModel) {
+	'use strict';
+
+	// initialize the application
+	MetacatUI.appModel = new AppModel();
+});
 
 /* Set up the test suite */
 define(["require", "mocha"], function(require, mocha) {
