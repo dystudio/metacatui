@@ -3171,6 +3171,7 @@ define(["jquery",
                 this.stopListening();
 
                 $(".DataCatalog").removeClass("DataCatalog");
+                $(".mapMode").removeClass("mapMode");
 
                 if (gmaps) {
                     // unset map mode

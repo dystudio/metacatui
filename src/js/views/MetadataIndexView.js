@@ -68,13 +68,21 @@ define(['jquery',
 				success: function(data, textStatus, xhr){
 
 					if(data.response.numFound == 0){
-						var msg = "<h4>Nothing was found for one of the following reasons:</h4>" +
-								  "<ul class='indent'>" +
-								  	  "<li>The ID '" + view.pid  + "' does not exist.</li>" +
-									  '<li>This may be private content. (Are you <a href="<%= MetacatUI.root %>/signin">signed in?</a>)</li>' +
-									  "<li>The content was removed because it was invalid.</li>" +
-								  "</ul>";
-						view.$el.html(view.alertTemplate({msg: msg, classes: "alert-danger"}));
+
+            if( view.parentView && view.parentView.model ){
+
+              //Show a "not indexed" message if there is system metadata but nothing in
+              // the index
+              if(view.parentView.model.get("systemMetadata")){
+                view.showNotIndexed();
+              }
+              //Show a "not found" message if there is no system metadata and no results in the index
+              else{
+                view.parentView.model.set("notFound", true);
+                view.parentView.showNotFound();
+              }
+            }
+
 						view.flagComplete();
 					}
 					else{
@@ -278,7 +286,7 @@ define(['jquery',
 				embeddedAttributes += view.attributeTemplate({
 					attribute: "",
 					formattedAttribute: view.transformCamelCase(attribute),
-					value: value[i],
+					value: value[i].toString(),
 					id: attribute + "_" + (i+1),
 					type: type,
 					resource: "#xpointer(//" + attribute + "[" + (i+1) + "])"
@@ -292,7 +300,7 @@ define(['jquery',
 			html += view.attributeTemplate({
 				attribute: attribute,
 				formattedAttribute: view.transformCamelCase(attribute),
-				value: embeddedAttributes || value,
+				value: embeddedAttributes || value.toString(),
 				id: attribute,
 				type: type,
 				resource: "#xpointer(//" + attribute + ")"
@@ -371,6 +379,42 @@ define(['jquery',
 			//Insert into the DOM right after the "general" information
 			this.$(".General").after(section);
 		},
+
+    //Shows a message to the user that indicates this object has not been indexed
+    showNotIndexed: function(){
+
+      var message = this.alertTemplate({
+        classes: "alert-warning",
+        msg: "<h4>There is limited information about this content.</h4>" +
+             "<p>This data or science metadata is available to download, but " +
+             "there seems to be an issue with displaying details on this webpage. " +
+             "If this content was recently submitted, it may still be in the processing queue.</p>",
+        includeEmail: true
+      });
+      this.$el.append(message);
+
+      //If this metadata doc is not indexed, we need to search the system metadata
+      //to see if it is publicly accessible.
+      if( this.parentView && this.parentView.model ){
+        //Get the system metadata string
+        var sysMeta = this.parentView.model.get("systemMetadata");
+        if(sysMeta){
+          //Parse it into XML nodes
+          sysMeta = $.parseXML(sysMeta);
+          //Find the allow permission for the public
+          var publicPermission = $(sysMeta).find("allow subject:contains('public')");
+          if( publicPermission.length ){
+            //Remove the "private" icon
+            $("#metadata-controls-container .private").remove();
+          }
+        }
+        //If there is no system metadata, default to hiding the private icon
+        else{
+          $("#metadata-controls-container .private").remove();
+        }
+      }
+
+    },
 
 		flagComplete: function(){
 			this.complete = true;
