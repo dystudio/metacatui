@@ -88,6 +88,8 @@ define(['underscore', 'jquery', 'backbone',
 
 			    "click  .remove" : "handleRemove"
         },
+					"click .remove-annotation": "removeAnnotation",
+					"change .eml-annotation input": "updateAnnotations"
 
         /* A list of the subviews */
         subviews: [],
@@ -240,6 +242,22 @@ define(['underscore', 'jquery', 'backbone',
   			// assumes multiple values for the category
   			// TODO: Consider a re-factor of createBasicText
   			var pubDateInput = $(overviewEl).find("input.pubDate").val(this.model.get("pubDate"));
+
+					// Create EMLAnnotation views as needed
+					var annotations = this.model.get("annotation");
+
+					_.each(annotations, function (anno) {
+						var view = new EMLAnnotationView({
+							model: anno,
+							isNew: anno.get("isNew")
+						});
+
+						view.render();
+						this.$(".dataset-annotation-list").append(view.el);
+					}, this);
+
+					// Add a new blank annotation
+					this.addAnnotation();
 
   			//Initialize all the tooltips
   			this.$(".tooltip-this").tooltip();
@@ -2353,6 +2371,137 @@ define(['underscore', 'jquery', 'backbone',
                 $(tableNums[i]).text(i + 1);
             }
 		    },
+
+        /**
+         * addAnnotation
+         *
+         * Adds a new dataset-level annotation to the view and the backing EML
+         * model.
+         */
+        addAnnotation: function () {
+          console.log("EML211View.addAnnotation");
+
+          // Don't add a new annotation if there's already a "new" one
+          if (this.$(".dataset-annotation-list .new").length > 0) {
+            console.log("  not adding a new annotation...");
+            return;
+          }
+
+          var annotationListEl = this.$(".dataset-annotation-list");
+
+          if (annotationListEl.length !== 1) {
+            return;
+          }
+
+          var model = new EMLAnnotation({ isNew: true });
+          var view = new EMLAnnotationView({
+            model: model,
+            isNew: true
+          });
+
+          view.render();
+          annotationListEl.append(view.el);
+
+          this.model.get("annotation").push(model);
+
+          // Ensure the entity has an `id` because annotations require it
+          if (!this.model.get("xmlID")) {
+            this.model.createID();
+          }
+
+          // Update
+          this.model.trickleUpChange();
+        },
+
+        /**
+         * removeAnnotation
+         *
+         * Click event handler that removes the view and model corresponding
+         * to the annotation the user clicked.
+         *
+         * @param {MouseEvent} e - Event handler
+         */
+        removeAnnotation: function (e) {
+          // Don't allow removal of the last view
+          if ($(".dataset-annotation-list .eml-annotation").length <= 1) {
+            return;
+          }
+
+          var annoEl = $(e.target).parents(".eml-annotation").first();
+
+          if (annoEl.length === 0) {
+            return;
+          }
+
+          var index = $(".dataset-annotation-list .eml-annotation").index(annoEl);
+
+          if (index < 0) {
+            return;
+          }
+
+          // Remove view
+          var annotationViews = $(".dataset-annotation-list .eml-annotation");
+
+          if (annotationViews.length < index) {
+            return;
+          }
+
+          // Don't remove view if it's a new view
+          if ($(annotationViews[index]).hasClass("new")) {
+            return;
+          }
+
+          annotationViews[index].remove();
+
+          // Remove model
+          var current = this.model.get("annotation");
+          current.splice(index, 1);
+          this.model.set("annotation", current);
+
+          // Update
+          this.model.trickleUpChange();
+        },
+
+        /**
+         * updateAnnotations
+         *
+         * Event handler responsible for managing the 'new' class on
+         * AnnotationViews which is used to decide when to add a new, blank
+         * view.
+         *
+         * @param {Event} e - Event handler
+         */
+        updateAnnotations: function (e) {
+          console.log("EML211View.updateAnnotations");
+
+          var annoEl = $(e.target).parents(".eml-annotation").first();
+
+          if (annoEl.length === 0) {
+            return;
+          }
+
+          var index = $(".dataset-annotation-list .eml-annotation").index(annoEl);
+
+          if (index < 0) {
+            return;
+          }
+
+          // Find the view that triggered the event
+          var annotationViews = $(".dataset-annotation-list .eml-annotation");
+
+          if (annotationViews.length < index) {
+            return;
+          }
+
+          // Stop now if we aren't updating an annotation that was previously
+          // new (blank)
+          if (!$(annotationViews[index]).hasClass("new")) {
+            return;
+          }
+
+          $(annotationViews[index]).removeClass("new");
+          this.addAnnotation();
+        },
 
         /* Close the view and its sub views */
         onClose: function() {
